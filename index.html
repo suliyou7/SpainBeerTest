@@ -343,6 +343,15 @@
         lucide.createIcons();
 
         // -------------------------------------------------------------
+        // HACK PARA OCULTAR BARRA URL EN MÓVILES
+        // -------------------------------------------------------------
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                window.scrollTo(0, 1);
+            }, 100);
+        });
+
+        // -------------------------------------------------------------
         // REGISTRO AUTOMÁTICO DE SERVICE WORKER PARA FORZAR MODO PWA
         // -------------------------------------------------------------
         if ('serviceWorker' in navigator) {
@@ -743,7 +752,6 @@
                         ingText = p.ingredients.map(i => i.text || i.id.replace('en:', '')).join(', ');
                     }
 
-                    // EL FIX: Si la API no tiene ingredientes declarados, bloqueamos el falso positivo
                     if (!ingText.trim()) {
                         alert(`Producto encontrado (${name}), pero la base de datos externa no tiene sus ingredientes. Añádelos manualmente para auditarla.`);
                         openCustomBeerModal();
@@ -755,7 +763,6 @@
 
                     const ings = ingText.split(',').map(s=>s.trim());
                     const lowerIngs = ingText.toLowerCase();
-                    // Detector de adjuntos
                     const hasAdjuncts = lowerIngs.includes('maíz') || lowerIngs.includes('corn') || lowerIngs.includes('arroz') || lowerIngs.includes('rice') || lowerIngs.includes('sugar') || lowerIngs.includes('azúcar') || lowerIngs.includes('extract') || lowerIngs.includes('jarabe');
 
                     selectBeer({
