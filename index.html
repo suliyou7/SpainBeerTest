@@ -29,12 +29,13 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
         .app-gradient {
-            background: linear-gradient(145deg, #0f172a, #020617); 
+            background: linear-gradient(145deg, #0f172a, #020617);
         }
         .card-glass {
             background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(10px);
-          }
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
         /* Animaciones para modales y pestañas */
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
         .slide-up { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -59,8 +60,6 @@
 </head>
 <body class="app-gradient text-slate-100 min-h-screen w-full flex flex-col font-sans selection:bg-amber-500 selection:text-slate-900">
 
-    <audio id="bgMusic" src="cancion.mp3" loop preload="auto"></audio>
-
     <header class="flex items-center justify-between px-5 pt-6 pb-4">
         <div class="flex items-center space-x-3">
             <div class="p-2 shadow-lg bg-amber-500 rounded-xl shadow-amber-500/20">
@@ -74,16 +73,13 @@
                 <p class="text-[11px] text-slate-400 font-medium">Auditoría Reinheitsgebot 1516</p>
             </div>
         </div>
-        <button onclick="toggleMuteSound()" id="soundToggleBtn" class="p-2.5 bg-slate-800/50 rounded-full border border-slate-700/50 text-slate-300 hover:text-white transition">
-            <i data-lucide="volume-2" class="w-5 h-5"></i>
-        </button>
     </header>
 
     <main class="relative flex-1 px-5 pb-32 no-scrollbar">
         
         <section id="tab-home" class="space-y-6 fade-in">
             
-            <div class="relative z-20">  
+            <div class="relative z-20">
                 <div class="flex items-center p-3 transition card-glass rounded-2xl space-x-3 focus-within:border-amber-500/50">
                     <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
                     <input type="text" id="searchInput" oninput="searchBeers()" placeholder="Buscar cerveza o EAN..." 
@@ -241,26 +237,26 @@
             </button>
 
             <button onclick="openScanner()" class="absolute left-1/2 -top-6 transform -translate-x-1/2 bg-gradient-to-b from-amber-400 to-amber-600 p-4 rounded-full shadow-[0_4px_20px_rgba(245,158,11,0.4)] border-4 border-slate-900 text-slate-900 active:scale-95 transition-transform z-50">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-9 h-9">
-        <!-- Marco de escaneo (esquinas con bordes redondeados) -->
-        <g stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
-            <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
-            <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
-            <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
-        </g>
-        
-        <!-- Código de barras (con bordes rectos para que la altura sea idéntica) -->
-        <g stroke-linecap="butt">
-            <path d="M6.5 8v8" stroke-width="1"></path>
-            <path d="M8.5 8v8" stroke-width="2"></path>
-            <path d="M11 8v8" stroke-width="1"></path>
-            <path d="M13 8v8" stroke-width="2"></path>
-            <path d="M15.5 8v8" stroke-width="1.5"></path>
-            <path d="M17.5 8v8" stroke-width="1"></path>
-        </g>
-    </svg>
-</button>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-9 h-9">
+                    <!-- Marco de escaneo (esquinas con bordes redondeados) -->
+                    <g stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+                        <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+                        <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+                        <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+                    </g>
+                    
+                    <!-- Código de barras (con bordes rectos para que la altura sea idéntica) -->
+                    <g stroke-linecap="butt">
+                        <path d="M6.5 8v8" stroke-width="1"></path>
+                        <path d="M8.5 8v8" stroke-width="2"></path>
+                        <path d="M11 8v8" stroke-width="1"></path>
+                        <path d="M13 8v8" stroke-width="2"></path>
+                        <path d="M15.5 8v8" stroke-width="1.5"></path>
+                        <path d="M17.5 8v8" stroke-width="1"></path>
+                    </g>
+                </svg>
+            </button>
         </div>
     </nav>
 
@@ -359,77 +355,6 @@
                 const blob = new Blob([swCode], { type: 'text/javascript' });
                 navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
             });
-        }
-
-        // -------------------------------------------------------------
-        // AUDIO DE FONDO Y EFECTOS
-        // -------------------------------------------------------------
-        let audioCtx = null;
-        let isMuted = false;
-        let bgMusicStarted = false;
-        const bgMusic = document.getElementById('bgMusic');
-
-        function startBgMusicOnUserInteraction() {
-            if (!bgMusicStarted && bgMusic) {
-                bgMusic.play().then(() => {
-                    bgMusicStarted = true;
-                }).catch(() => {});
-            }
-        }
-        document.addEventListener('click', startBgMusicOnUserInteraction, { once: true });
-        document.addEventListener('touchstart', startBgMusicOnUserInteraction, { once: true });
-
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-        }
-
-        function playSound(type) {
-            if (isMuted) return;
-            initAudio();
-            if (!audioCtx) return;
-
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            const now = audioCtx.currentTime;
-
-            if (type === 'pure') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, now);
-                osc.frequency.exponentialRampToValueAtTime(880, now + 0.2);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            } else if (type === 'impure') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(220, now);
-                osc.frequency.exponentialRampToValueAtTime(110, now + 0.2);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-                osc.start(now);
-                osc.stop(now + 0.35);
-            } else if (type === 'scan') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(1200, now);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
-            }
-        }
-
-        function toggleMuteSound() {
-            isMuted = !isMuted;
-            if (bgMusic) bgMusic.muted = isMuted;
-            const btn = document.getElementById("soundToggleBtn");
-            btn.innerHTML = isMuted 
-                ? `<i data-lucide="volume-x" class="w-5 h-5 text-rose-400"></i>` 
-                : `<i data-lucide="volume-2" class="w-5 h-5 text-slate-300"></i>`;
-            lucide.createIcons();
         }
 
         // -------------------------------------------------------------
@@ -560,7 +485,6 @@
         function selectBeer(beer) {
             clearSearch();
             const isPure = beer.status === 'cumple';
-            playSound(isPure ? 'pure' : 'impure');
 
             const content = document.getElementById("resultContent");
             
@@ -748,7 +672,6 @@
         let isTorchOn = false;
 
         function openScanner() {
-            initAudio();
             document.getElementById("scannerModal").classList.remove("hidden");
             if (!html5QrcodeScanner) html5QrcodeScanner = new Html5Qrcode("reader");
 
@@ -773,7 +696,6 @@
                 cameraId,
                 { fps: 15, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0 },
                 (decodedText) => {
-                    playSound('scan');
                     closeScanner();
                     processBarcode(decodedText);
                 },
