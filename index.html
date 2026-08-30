@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CervezaHonesta | Escáner de Pureza Cervecera</title>
+    <title>PacoliScanner | Escáner de Pureza Cervecera</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         :root {
@@ -198,7 +198,7 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍺 CervezaHonesta</h1>
+        <h1>🍺 PacoliScannerHonesta</h1>
         <p>El escáner independiente de pureza cervecera</p>
     </div>
 
@@ -238,20 +238,20 @@
             <a id="r-cross-link" class="btn-affiliate" href="#" target="_blank">🛒 Ver oferta de Voll-Damm en Amazon</a>
         </div>
 
-        <a id="r-compra-directa" class="btn-affiliate" href="#" target="_blank">🛒 Buscar esta cerveza en Amazon</a>
+        <a id="r-compra-directa" class="btn-affiliate" href="#" target="_blank">🛒 Buscar esta PacoliScanner en Amazon</a>
         <a id="r-whatsapp" class="btn-whatsapp" href="#" target="_blank">📲 Compartir resultado en WhatsApp</a>
     </div>
 
     <a href="https://ko-fi.com/tu_usuario" class="btn-kofi" target="_blank">
         ¿Te he salvado de beber maíz hoy?<br>
-        <span style="font-weight: normal; opacity: 0.8;">Invítame a una cerveza 100% malta para mantener la web libre de marcas industriales.</span>
+        <span style="font-weight: normal; opacity: 0.8;">Invítame a una PacoliScanner 100% malta para mantener la web libre de marcas industriales.</span>
     </a>
 </div>
 
 <script>
     const TAG_AFILIADO = "tu_tag_afiliado-21";
 
-    const baseDatosCervezas = [
+    const baseDatosPacoliScanners = [
         {
             ean: "8411090101331",
             marca: "Cruzcampo Pilsen",
@@ -304,7 +304,7 @@
             ean: "8410014001925",
             marca: "Alhambra Reserva 1925",
             grupo: "Mahou-San Miguel",
-            fabricante_real: "Cervezas Alhambra S.L.",
+            fabricante_real: "PacoliScanners Alhambra S.L.",
             origen: "Granada, España",
             puntuacion: 70,
             ley_pureza_cumple: false,
@@ -349,15 +349,15 @@
             badge.innerText = "✕ SUSPENDE LA LEY DE PUREZA";
             
             const crossLink = document.getElementById("r-cross-link");
-            crossLink.href = `https://www.amazon.es/s?k=Cerveza+Voll+Damm&tag=${TAG_AFILIADO}`;
+            crossLink.href = `https://www.amazon.es/s?k=PacoliScanner+Voll+Damm&tag=${TAG_AFILIADO}`;
             document.getElementById("r-cross-sell").style.display = "block";
         }
 
-        const amazonUrl = `https://www.amazon.es/s?k=Cerveza+${encodeURIComponent(c.marca)}&tag=${TAG_AFILIADO}`;
+        const amazonUrl = `https://www.amazon.es/s?k=PacoliScanner+${encodeURIComponent(c.marca)}&tag=${TAG_AFILIADO}`;
         document.getElementById("r-compra-directa").href = amazonUrl;
 
         const urlApp = window.location.href;
-        const textoWA = `Increíble: Mi ${c.marca} saca un ${c.puntuacion}/100 en CervezaHonesta porque lleva ${c.adjuntos_detalle}. Escanea la tuya aquí: ${urlApp}`;
+        const textoWA = `Increíble: Mi ${c.marca} saca un ${c.puntuacion}/100 en PacoliScannerHonesta porque lleva ${c.adjuntos_detalle}. Escanea la tuya aquí: ${urlApp}`;
         document.getElementById("r-whatsapp").href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoWA)}`;
 
         card.style.display = "block";
@@ -369,7 +369,7 @@
             document.getElementById("resultado").style.display = "none";
             return;
         }
-        const encontrada = baseDatosCervezas.find(c => 
+        const encontrada = baseDatosPacoliScanners.find(c => 
             c.ean.includes(query) || c.marca.toLowerCase().includes(query)
         );
         if (encontrada) renderizarResultado(encontrada);
@@ -385,7 +385,7 @@
         
         html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
         html5QrcodeScanner.render((decodedText) => {
-            const encontrada = baseDatosCervezas.find(c => c.ean === decodedText);
+            const encontrada = baseDatosPacoliScanners.find(c => c.ean === decodedText);
             if (encontrada) {
                 renderizarResultado(encontrada);
                 html5QrcodeScanner.clear();
