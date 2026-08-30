@@ -448,6 +448,11 @@
         // BASE DE DATOS
         // -------------------------------------------------------------
         const defaultBeers = {
+            "8411090032000": {
+                name: "Cruzcampo Pilsen (Litro)", brand: "Cruzcampo", status: "nocumple",
+                ingredients: ["Agua", "Malta de Cebada", "Maíz", "Lúpulo", "Extracto de Lúpulo"],
+                details: "Contiene maíz como adjunto para abaratar costes y extractos artificiales de lúpulo. Falsa pilsen que incumple la norma de 1516.", score: "4.0/10"
+            },
             "8410000001925": {
                 name: "Alhambra Reserva 1925", brand: "Cervezas Alhambra", status: "nocumple",
                 ingredients: ["Agua", "Malta de Cebada", "Maíz", "Lúpulo"],
@@ -792,22 +797,37 @@
                     const p = data.product;
                     const name = p.product_name || p.product_name_es || "Cerveza Desconocida";
                     const brand = p.brands || "Marca Desconocida";
-                    const ingText = p.ingredients_text || p.ingredients_text_es || "";
                     
-                    let ings = ingText ? ingText.split(',').map(s=>s.trim()) : (p.ingredients ? p.ingredients.map(i => i.text || i.id.replace('en:', '')) : ["Agua", "Malta de Cebada", "Lúpulo"]);
+                    let ingText = p.ingredients_text || p.ingredients_text_es || "";
                     
+                    if (!ingText && p.ingredients && p.ingredients.length > 0) {
+                        ingText = p.ingredients.map(i => i.text || i.id.replace('en:', '')).join(', ');
+                    }
+
+                    // EL FIX: Si la API no tiene ingredientes declarados, bloqueamos el falso positivo
+                    if (!ingText.trim()) {
+                        alert(`Producto encontrado (${name}), pero la base de datos externa no tiene sus ingredientes. Añádelos manualmente para auditarla.`);
+                        openCustomBeerModal();
+                        document.getElementById("customEAN").value = barcode;
+                        document.getElementById("customName").value = name;
+                        document.getElementById("customBrand").value = brand;
+                        return;
+                    }
+
+                    const ings = ingText.split(',').map(s=>s.trim());
                     const lowerIngs = ingText.toLowerCase();
-                    const hasAdjuncts = lowerIngs.includes('maíz') || lowerIngs.includes('corn') || lowerIngs.includes('arroz') || lowerIngs.includes('rice') || lowerIngs.includes('sugar') || lowerIngs.includes('azúcar') || lowerIngs.includes('extract');
+                    // Detector de adjuntos
+                    const hasAdjuncts = lowerIngs.includes('maíz') || lowerIngs.includes('corn') || lowerIngs.includes('arroz') || lowerIngs.includes('rice') || lowerIngs.includes('sugar') || lowerIngs.includes('azúcar') || lowerIngs.includes('extract') || lowerIngs.includes('jarabe');
 
                     selectBeer({
                         name, brand,
                         status: hasAdjuncts ? "nocumple" : "cumple",
                         ingredients: ings,
-                        details: hasAdjuncts ? "Consulta BBDD Externa: Se detectaron adjuntos o azúcares en la declaración nutricional del código escaneado." : "Consulta BBDD Externa: Ingredientes declarados conformes a la pureza tradicional.",
-                        score: hasAdjuncts ? "5.5/10" : "8.8/10"
+                        details: hasAdjuncts ? "Consulta BBDD Externa: Se detectaron adjuntos, azúcares o extractos en la declaración nutricional." : "Consulta BBDD Externa: Ingredientes declarados conformes a la pureza tradicional.",
+                        score: hasAdjuncts ? "5.0/10" : "8.5/10"
                     });
                 } else {
-                    alert(`Código EAN ${barcode} no encontrado. Regístralo manualmente para ganar puntos PRO.`);
+                    alert(`Código EAN ${barcode} no encontrado. Regístralo manualmente.`);
                     openCustomBeerModal();
                     document.getElementById("customEAN").value = barcode;
                 }
