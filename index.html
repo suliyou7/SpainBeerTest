@@ -3,679 +3,794 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscador de Cervezas - Ley de Pureza de 1516</title>
+    <title>CervezaHonesta - Escáner EAN-13 y Calidad de Cervezas</title>
+    <!-- Librería html5-qrcode para escáner de códigos de barras mediante cámara -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         :root {
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --primary: #d97706;
-            --primary-hover: #b45309;
-            --success-bg: #dcfce7;
-            --success-text: #15803d;
-            --danger-bg: #fee2e2;
-            --danger-text: #b91c1c;
-            --border-color: #e2e8f0;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --radius: 12px;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-accent: #334155;
+            --amber-main: #f59e0b;
+            --amber-hover: #d97706;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --border-color: #334155;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 20px;
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 40px;
         }
 
         header {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-bottom: 2px solid var(--amber-main);
+            padding: 1.25rem 1rem;
             text-align: center;
-            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
         }
 
-        header h1 {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 8px;
+        .header-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--amber-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            letter-spacing: -0.5px;
         }
 
-        header p {
+        .header-subtitle {
+            font-size: 0.9rem;
             color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        main {
+            max-width: 800px;
+            width: 95%;
+            margin: 1.5rem auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Banner Ley de Pureza Alemana */
+        .banner-pureza {
+            background: rgba(245, 158, 11, 0.08);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-left: 5px solid var(--amber-main);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            line-height: 1.5;
             font-size: 0.95rem;
         }
 
-        /* Buscador */
-        .search-wrapper {
-            position: relative;
-            margin-bottom: 20px;
+        .banner-pureza h3 {
+            color: var(--amber-main);
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
         }
 
-        .search-box {
-            display: flex;
-            align-items: center;
-            background: var(--card-bg);
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 6px 16px;
-            box-shadow: var(--shadow);
-            transition: border-color 0.2s ease;
+        .banner-pureza a {
+            color: #fbbf24;
+            text-decoration: underline;
+            font-weight: 600;
+            transition: color 0.2s;
         }
 
-        .search-box:focus-within {
-            border-color: var(--primary);
+        .banner-pureza a:hover {
+            color: #f59e0b;
         }
 
-        .search-box input {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 10px;
-            font-size: 1rem;
-            color: var(--text-main);
-            background: transparent;
-        }
-
-        .search-box .clear-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            padding: 4px;
-            display: none;
-        }
-
-        /* Desplegable de sugerencias */
-        .suggestions-list {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
+        /* Escáner */
+        .scanner-card {
+            background-color: var(--bg-card);
+            border-radius: 16px;
             border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            margin-top: 6px;
-            max-height: 250px;
-            overflow-y: auto;
-            box-shadow: var(--shadow);
-            z-index: 100;
-            display: none;
+            padding: 1.25rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        .suggestion-item {
-            padding: 10px 16px;
-            cursor: pointer;
+        .scanner-header {
+            width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
         }
 
-        .suggestion-item:last-child {
-            border-bottom: none;
+        .scanner-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-light);
         }
 
-        .suggestion-item:hover {
-            background-color: #f1f5f9;
+        #reader {
+            width: 100%;
+            max-width: 500px;
+            min-height: 280px;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px dashed var(--bg-accent);
         }
 
-        .suggestion-item .brand {
-            font-size: 0.85rem;
-            color: var(--text-muted);
+        #reader video {
+            object-fit: cover !important;
+            border-radius: 10px;
         }
 
-        /* Filtros rápidos */
-        .filter-tags {
+        .scanner-controls {
             display: flex;
-            gap: 10px;
-            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn {
+            background-color: var(--amber-main);
+            color: #000;
+            font-weight: 700;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .btn:hover {
+            background-color: var(--amber-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-accent);
+            color: var(--text-light);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: #fff;
+            box-shadow: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        /* Buscador manual */
+        .search-card {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            display: flex;
+            gap: 0.75rem;
             flex-wrap: wrap;
         }
 
-        .tag-btn {
-            background: var(--card-bg);
+        .search-input {
+            flex: 1;
+            min-width: 220px;
+            background-color: var(--bg-dark);
             border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--text-muted);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            color: var(--text-light);
+            font-size: 1rem;
+            outline: none;
         }
 
-        .tag-btn.active, .tag-btn:hover {
-            background: var(--primary);
-            color: #ffffff;
-            border-color: var(--primary);
+        .search-input:focus {
+            border-color: var(--amber-main);
         }
 
-        /* Grid de Cervezas */
-        .beer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .beer-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .beer-card h3 {
-            font-size: 1.2rem;
-            margin-bottom: 4px;
-        }
-
-        .beer-card .brewery {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-bottom: 12px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-bottom: 12px;
-            align-self: flex-start;
-        }
-
-        .badge.pure {
-            background: var(--success-bg);
-            color: var(--success-text);
-        }
-
-        .badge.adjuncts {
-            background: var(--danger-bg);
-            color: var(--danger-text);
-        }
-
-        .details-list {
-            font-size: 0.88rem;
-            color: var(--text-main);
-            margin-bottom: 16px;
-        }
-
-        .details-list li {
-            list-style: none;
-            margin-bottom: 4px;
-        }
-
-        .btn-modal {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: background 0.2s ease;
-        }
-
-        .btn-modal:hover {
-            background: #e2e8f0;
-        }
-
-        .no-results {
-            text-align: center;
-            grid-column: 1 / -1;
-            padding: 40px;
-            color: var(--text-muted);
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            border: 1px dashed var(--border-color);
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
+        /* Ficha de resultado */
+        .result-container {
             display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            animation: fadeIn 0.3s ease-in-out;
         }
 
-        .modal-content {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: var(--radius);
-            max-width: 500px;
-            width: 100%;
-            position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .modal-close {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            border: none;
-            background: none;
+        .beer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+
+        .beer-name {
             font-size: 1.5rem;
-            cursor: pointer;
+            font-weight: 800;
+            color: var(--amber-main);
+        }
+
+        .beer-brand {
+            font-size: 1rem;
             color: var(--text-muted);
         }
 
-        .modal-content h2 {
-            margin-bottom: 6px;
-            color: var(--primary);
+        .ean-tag {
+            background-color: var(--bg-accent);
+            padding: 0.35rem 0.75rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-light);
         }
 
-        .modal-section {
-            margin-top: 16px;
+        .beer-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.25rem;
         }
 
-        .modal-section h4 {
-            font-size: 0.9rem;
+        .detail-item {
+            background: var(--bg-dark);
+            padding: 0.85rem;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-label {
+            font-size: 0.8rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 4px;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .pureza-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .pureza-badge.cumple {
+            background-color: rgba(34, 197, 94, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+        .pureza-badge.no-cumple {
+            background-color: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+        }
+
+        .affiliate-link {
+            display: block;
+            text-align: center;
+            background: linear-gradient(135deg, #ff9900, #e67e22);
+            color: #000;
+            text-decoration: none;
+            font-weight: 800;
+            padding: 0.85rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        /* Catálogo */
+        .catalog-card {
+            background-color: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+        }
+
+        .catalog-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .beer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .catalog-item {
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .catalog-item:hover {
+            border-color: var(--amber-main);
+            transform: translateY(-2px);
+        }
+
+        .catalog-item-name {
+            font-weight: 700;
+            color: var(--amber-main);
+            margin-bottom: 0.2rem;
+        }
+
+        .catalog-item-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .tag-sm {
+            display: inline-block;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .tag-pureza-yes {
+            background-color: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .tag-pureza-no {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <h1>Buscador de Cervezas</h1>
-            <p>Comprueba el cumplimiento de la Ley de Pureza Alemana de 1516 (Reinheitsgebot)</p>
-        </header>
-
-        <!-- Buscador -->
-        <div class="search-wrapper">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Busca por marca, nombre, EAN o ingrediente (ej. 'cruz', 'mahou', 'arroz')..." autocomplete="off">
-                <button class="clear-btn" id="clearBtn" title="Limpiar">&times;</button>
-            </div>
-            <div class="suggestions-list" id="suggestionsList"></div>
+    <header>
+        <div class="header-title">
+            🍺 CervezaHonesta
         </div>
+        <div class="header-subtitle">Escáner EAN-13, ingredientes y verificación de calidad</div>
+    </header>
 
-        <!-- Filtros Rápidos -->
-        <div class="filter-tags">
-            <button class="tag-btn active" data-filter="all">Todas</button>
-            <button class="tag-btn" data-filter="pure">Solo Cumple Ley Pureza</button>
-            <button class="tag-btn" data-filter="adjuncts">Con Adjuntos / No Cumple</button>
-        </div>
+    <main>
+        <!-- Banner Ley de Pureza Alemana -->
+        <section class="banner-pureza">
+            <h3>📜 Ley de Pureza Alemana (Reinheitsgebot)</h3>
+            <p>
+                Analizamos cada cerveza basándonos en los estándares tradicionales de la 
+                <a href="https://es.wikipedia.org/wiki/Ley_de_pureza_de_1516" target="_blank" rel="noopener noreferrer">
+                    Ley de Pureza Alemana de 1516
+                </a>, 
+                la cual establece que una cerveza genuina debe elaborarse únicamente con 4 ingredientes naturales: 
+                <strong>agua, malta de cebada, lúpulo y levadura</strong> (sin adjuntos de maíz, arroz, azúcares añadidos ni conservantes).
+            </p>
+        </section>
 
-        <!-- Resultados -->
-        <div class="beer-grid" id="beerGrid"></div>
-    </div>
-
-    <!-- Modal Detalle -->
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-content">
-            <button class="modal-close" id="modalClose">&times;</button>
-            <h2 id="modalTitle">Nombre Cerveza</h2>
-            <p id="modalBrewery" class="brewery">Marca / Cervecería</p>
-            
-            <div id="modalBadge" class="badge"></div>
-
-            <div class="modal-section">
-                <h4>Estilo y Origen</h4>
-                <p id="modalStyleOrigin">-</p>
+        <!-- Bloque del Escáner -->
+        <section class="scanner-card">
+            <div class="scanner-header">
+                <span class="scanner-title">📷 Escáner de Código de Barras</span>
+                <span id="scanner-status" style="font-size:0.85rem; color:var(--text-muted);">Inactivo</span>
             </div>
 
-            <div class="modal-section">
-                <h4>Ingredientes</h4>
-                <p id="modalIngredients">-</p>
+            <!-- Contenedor del video html5-qrcode -->
+            <div id="reader"></div>
+
+            <div class="scanner-controls">
+                <button id="btn-toggle" class="btn">
+                    <span>▶ Activar Escáner</span>
+                </button>
+                <button id="btn-switch-cam" class="btn btn-secondary" style="display:none;">
+                    🔄 Cambiar Cámara
+                </button>
+            </div>
+        </section>
+
+        <!-- Búsqueda Manual -->
+        <section class="search-card">
+            <input type="text" id="search-input" class="search-input" placeholder="Buscar cerveza por marca, nombre o EAN-13...">
+            <button id="btn-search" class="btn">🔍 Buscar</button>
+        </section>
+
+        <!-- Resultado -->
+        <section id="result-container" class="result-container">
+            <div class="beer-header">
+                <div>
+                    <div class="beer-name" id="res-name">Nombre de Cerveza</div>
+                    <div class="beer-brand" id="res-brand">Marca / Cervecera</div>
+                </div>
+                <div class="ean-tag" id="res-ean">EAN: 0000000000000</div>
             </div>
 
-            <div class="modal-section" id="modalAdjunctsSection">
-                <h4>Detalle de Adjuntos / Aditivos</h4>
-                <p id="modalAdjunctsDetail">-</p>
+            <div class="beer-details">
+                <div class="detail-item">
+                    <div class="detail-label">Estilo</div>
+                    <div class="detail-value" id="res-style">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Graduación (ABV)</div>
+                    <div class="detail-value" id="res-abv">-</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Origen</div>
+                    <div class="detail-value" id="res-origin">-</div>
+                </div>
+                <div class="detail-item" style="grid-column: span 1 / -1;">
+                    <div class="detail-label">Ingredientes</div>
+                    <div class="detail-value" id="res-ingredients" style="font-weight:400; font-size:0.95rem;">-</div>
+                </div>
             </div>
 
-            <div class="modal-section">
-                <h4>Código EAN-13</h4>
-                <p id="modalEAN">-</p>
+            <div id="res-pureza-badge" class="pureza-badge cumple">
+                ✓ Cumple la Ley de Pureza Alemana
             </div>
-        </div>
-    </div>
+
+            <a id="res-affiliate" href="#" target="_blank" class="affiliate-link" style="display:none;">
+                🛒 Ver o Comprar en Amazon
+            </a>
+        </section>
+
+        <!-- Catálogo -->
+        <section class="catalog-card">
+            <div class="catalog-title">
+                <span>📚 Base de Datos Registrada</span>
+                <span id="catalog-count" style="font-size:0.85rem; color:var(--amber-main); font-weight:normal;"></span>
+            </div>
+            <div class="beer-grid" id="catalog-grid"></div>
+        </section>
+    </main>
 
     <script>
-        // ==========================================
-        // BASE DE DATOS DE CERVEZAS
-        // ==========================================
-        const baseDatosCervezas = [
+        // Base de datos JSON local de cervezas con códigos EAN-13 reales
+        const beerDatabase = [
             {
-                id: 1,
-                nombre: "Cruzcampo Especial",
-                marca: "Heineken España",
-                estilo: "Lager Pilsen",
-                alcohol: "5.6%",
-                origen: "Sevilla, España",
-                ean: "8410298001012",
-                cumple_ley_pureza: false,
-                ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo", "Extracto de lúpulo"],
-                adjuntos_detalle: "Contiene maíz como adjunto cervecero y extracto de lúpulo."
+                ean: "8410707000030",
+                brand: "Estrella Galicia",
+                name: "Estrella Galicia Especial",
+                style: "Lager / Pilsen",
+                abv: "5.5%",
+                origin: "España (A Coruña)",
+                ingredients: "Agua, malta de cebada, maíz y lúpulo.",
+                pureza1516: false,
+                reason: "Contiene maíz como adjunto cervecero.",
+                amazonUrl: "https://www.amazon.es/dp/B073Z8S8J7"
             },
             {
-                id: 2,
-                nombre: "Cruz del Sur",
-                marca: "Cervecería del Sur",
-                estilo: "Golden Ale",
-                alcohol: "4.8%",
-                origen: "Mendoza, Argentina",
-                ean: "7791234567890",
-                cumple_ley_pureza: true,
-                ingredientes: ["Agua de deshielo", "Malta de cebada", "Lúpulo", "Levadura"],
-                adjuntos_detalle: "Sin adjuntos ni aditivos. Fabricada bajo tradición clásica."
+                ean: "8410005001012",
+                brand: "Mahou",
+                name: "Mahou Cinco Estrellas",
+                style: "Pale Lager",
+                abv: "5.5%",
+                origin: "España (Madrid)",
+                ingredients: "Agua, malta de cebada, lúpulo, levadura.",
+                pureza1516: true,
+                reason: "100% Malta de cebada, sin adjuntos.",
+                amazonUrl: "https://www.amazon.es/dp/B07BHHKZ8Z"
             },
             {
-                id: 3,
-                nombre: "Mahou Cinco Estrellas",
-                marca: "Mahou-San Miguel",
-                estilo: "Lager Pilsen",
-                alcohol: "5.5%",
-                origen: "Madrid, España",
-                ean: "8410790000010",
-                cumple_ley_pureza: false,
-                ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo"],
-                adjuntos_detalle: "Contiene maíz no malteado para aligerar cuerpo."
+                ean: "4008248000078",
+                brand: "Paulaner",
+                name: "Paulaner Hefe-Weißbier",
+                style: "Hefeweizen (Trigo)",
+                abv: "5.5%",
+                origin: "Alemania (Múnich)",
+                ingredients: "Agua, malta de trigo, malta de cebada, levadura, lúpulo.",
+                pureza1516: true,
+                reason: "Elaborada estrictamente bajo el Reinheitsgebot alemán.",
+                amazonUrl: "https://www.amazon.es/dp/B01B5T5QMK"
             },
             {
-                id: 4,
-                nombre: "Estrella Galicia Especial",
-                marca: "Hijos de Rivera",
-                estilo: "Lager Especial",
-                alcohol: "5.5%",
-                origen: "A Coruña, España",
-                ean: "8412599000019",
-                cumple_ley_pureza: false,
-                ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo"],
-                adjuntos_detalle: "Utiliza maíz en su receta tradicional."
+                ean: "4005249000010",
+                brand: "Franziskaner",
+                name: "Franziskaner Weissbier Naturtrüb",
+                style: "Trigo Alemán",
+                abv: "5.0%",
+                origin: "Alemania (Baviera)",
+                ingredients: "Agua, malta de trigo, malta de cebada, extracto de lúpulo, levadura.",
+                pureza1516: true,
+                reason: "Tradición bávara acorde a la Ley de 1516.",
+                amazonUrl: "https://www.amazon.es/dp/B00N2F7LRE"
             },
             {
-                id: 5,
-                nombre: "Paulaner Hefe-Weißbier",
-                marca: "Paulaner Brauerei",
-                estilo: "Weissbier (Trigo)",
-                alcohol: "5.5%",
-                origen: "Múnich, Alemania",
-                ean: "4006600000123",
-                cumple_ley_pureza: true,
-                ingredientes: ["Agua", "Malta de trigo", "Malta de cebada", "Levadura", "Lúpulo"],
-                adjuntos_detalle: "100% conforme a la Ley de Pureza Alemana de 1516."
+                ean: "8410707001051",
+                brand: "1906",
+                name: "1906 Reserva Especial",
+                style: "Helles Bock / Extra Lager",
+                abv: "6.5%",
+                origin: "España (Galicia)",
+                ingredients: "Agua, malta de cebada, maíz, lúpulo.",
+                pureza1516: false,
+                reason: "Incorpora maíz en su receta.",
+                amazonUrl: "https://www.amazon.es/dp/B0798C1Q5C"
             },
             {
-                id: 6,
-                nombre: "Augustiner Edelstoff",
-                marca: "Augustiner-Bräu",
-                estilo: "Export / Helles",
-                alcohol: "5.6%",
-                origen: "Múnich, Alemania",
-                ean: "4014286000015",
-                cumple_ley_pureza: true,
-                ingredientes: ["Agua", "Malta de cebada", "Lúpulo"],
-                adjuntos_detalle: "Elaboración artesanal histórica conforme al Reinheitsgebot."
+                ean: "8410525000014",
+                brand: "Alhambra",
+                name: "Alhambra Reserva 1925",
+                style: "Strong Lager",
+                abv: "6.4%",
+                origin: "España (Granada)",
+                ingredients: "Agua, malta de cebada, lúpulo.",
+                pureza1516: true,
+                reason: "Malta de cebada de primera calidad sin adjuntos.",
+                amazonUrl: "https://www.amazon.es/dp/B01F3L9C7K"
             },
             {
-                id: 7,
-                nombre: "Alhambra Reserva 1925",
-                marca: "Mahou-San Miguel",
-                estilo: "Strong Lager",
-                alcohol: "6.4%",
-                origen: "Granada, España",
-                ean: "8410790022227",
-                cumple_ley_pureza: true,
-                ingredientes: ["Agua", "Malta de cebada", "Lúpulo", "Levadura"],
-                adjuntos_detalle: "No contiene adjuntos. Elaboración limpia con malta 100%."
+                ean: "8712000028886",
+                brand: "Heineken",
+                name: "Heineken Original Premium",
+                style: "Pale Lager",
+                abv: "5.0%",
+                origin: "Países Bajos",
+                ingredients: "Agua, malta de cebada, lúpulo y levadura A-Yeast.",
+                pureza1516: true,
+                reason: "Ingredientes 100% naturales.",
+                amazonUrl: "https://www.amazon.es/dp/B0797Z5MLK"
             },
             {
-                id: 8,
-                nombre: "Corona Extra",
-                marca: "Grupo Modelo / AB InBev",
-                estilo: "American Adjunct Lager",
-                alcohol: "4.5%",
-                origen: "Ciudad de México, México",
-                ean: "7501064191122",
-                cumple_ley_pureza: false,
-                ingredientes: ["Agua", "Malta de cebada", "Arroz", "Maíz", "Lúpulo", "Ascorbato de sodio", "E-405"],
-                adjuntos_detalle: "Contiene arroz, maíz y estabilizantes de espuma (E-405)."
+                ean: "4004724000129",
+                brand: "Weihenstephaner",
+                name: "Weihenstephaner Hefeweissbier",
+                style: "Weizen / Trigo",
+                abv: "5.4%",
+                origin: "Alemania (Freising)",
+                ingredients: "Agua, malta de trigo, malta de cebada, lúpulo, levadura.",
+                pureza1516: true,
+                reason: "De la cervecera más antigua del mundo (1040), 100% pura.",
+                amazonUrl: "https://www.amazon.es/dp/B017XQY8G6"
+            },
+            {
+                ean: "8410005001159",
+                brand: "Cruzcampo",
+                name: "Cruzcampo Especial",
+                style: "Pilsen",
+                abv: "5.6%",
+                origin: "España (Sevilla)",
+                ingredients: "Agua, malta de cebada, maíz, lúpulo, extracto de lúpulo.",
+                pureza1516: false,
+                reason: "Utiliza maíz como sustituto parcial de la malta.",
+                amazonUrl: "https://www.amazon.es/dp/B07CHW45W8"
             }
         ];
 
-        // ==========================================
-        // MOTOR DE BÚSQUEDA Y NORMALIZACIÓN
-        // ==========================================
+        let html5QrCode = null;
+        let isScanning = false;
+        let currentFacingMode = "environment";
 
-        // Quita acentos, diacríticos y pasa a minúsculas limpia
-        function normalizar(texto) {
-            if (!texto) return '';
-            return texto
-                .toString()
-                .toLowerCase()
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "")
-                .trim();
+        function playBeep() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.15);
+            } catch (e) {}
         }
 
-        // Verifica si TODOS los términos buscados existen dentro del texto de la cerveza
-        function coincideBusqueda(textoDestino, query) {
-            const normDestino = normalizar(textoDestino);
-            const normQuery = normalizar(query);
-            if (!normQuery) return true;
-
-            // Separa por espacios permitiendo buscar múltiples términos (ej: "cruz sur")
-            const terminos = normQuery.split(/\s+/).filter(t => t.length > 0);
-            return terminos.every(termino => normDestino.includes(termino));
-        }
-
-        // Evalúa una cerveza frente al término de búsqueda
-        function buscarEnCerveza(cerveza, query) {
-            const textoCompleto = [
-                cerveza.nombre,
-                cerveza.marca,
-                cerveza.estilo,
-                cerveza.ean,
-                cerveza.origen,
-                cerveza.ingredientes.join(' '),
-                cerveza.adjuntos_detalle
-            ].join(' ');
-
-            return coincideBusqueda(textoCompleto, query);
-        }
-
-        // ==========================================
-        // ESTADO DE LA APLICACIÓN
-        // ==========================================
-        let filtroActual = 'all';
-        const searchInput = document.getElementById('searchInput');
-        const clearBtn = document.getElementById('clearBtn');
-        const suggestionsList = document.getElementById('suggestionsList');
-        const beerGrid = document.getElementById('beerGrid');
-        const tagButtons = document.querySelectorAll('.tag-btn');
-
-        // Modales
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalClose = document.getElementById('modalClose');
-
-        // ==========================================
-        // RENDERIZADO Y UI
-        // ==========================================
-
-        function renderResultados() {
-            const query = searchInput.value;
-            
-            // Filtrar elementos
-            const resultados = baseDatosCervezas.filter(cerveza => {
-                const coincideTexto = buscarEnCerveza(cerveza, query);
-                
-                let coincideFiltro = true;
-                if (filtroActual === 'pure') coincideFiltro = cerveza.cumple_ley_pureza === true;
-                if (filtroActual === 'adjuncts') coincideFiltro = cerveza.cumple_ley_pureza === false;
-
-                return coincideTexto && coincideFiltro;
+        document.addEventListener("DOMContentLoaded", () => {
+            renderCatalog(beerDatabase);
+            document.getElementById("btn-toggle").addEventListener("click", toggleScanner);
+            document.getElementById("btn-switch-cam").addEventListener("click", switchCamera);
+            document.getElementById("btn-search").addEventListener("click", performSearch);
+            document.getElementById("search-input").addEventListener("keypress", (e) => {
+                if (e.key === 'Enter') performSearch();
             });
+        });
 
-            // Pintar resultados
-            beerGrid.innerHTML = '';
-            if (resultados.length === 0) {
-                beerGrid.innerHTML = `
-                    <div class="no-results">
-                        <h3>No se encontraron cervezas</h3>
-                        <p>Intenta con otros términos como "Cruzcampo", "Cruz del Sur", "Lager" o un código EAN.</p>
-                    </div>
-                `;
-                return;
+        function toggleScanner() {
+            if (isScanning) {
+                stopScanner();
+            } else {
+                startScanner();
+            }
+        }
+
+        function startScanner() {
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("reader");
             }
 
-            resultados.forEach(cerveza => {
-                const card = document.createElement('div');
-                card.className = 'beer-card';
+            const config = {
+                fps: 15,
+                qrbox: { width: 280, height: 160 },
+                aspectRatio: 1.777778,
+                formatsToSupport: [
+                    Html5QrcodeSupportedFormats.EAN_13,
+                    Html5QrcodeSupportedFormats.EAN_8,
+                    Html5QrcodeSupportedFormats.CODE_128
+                ]
+            };
+
+            const btnToggle = document.getElementById("btn-toggle");
+            const btnSwitch = document.getElementById("btn-switch-cam");
+            const statusLabel = document.getElementById("scanner-status");
+
+            statusLabel.textContent = "Buscando cámara...";
+
+            html5QrCode.start(
+                { facingMode: currentFacingMode },
+                config,
+                onScanSuccess,
+                onScanFailure
+            ).then(() => {
+                isScanning = true;
+                btnToggle.innerHTML = "⏹ Detener Escáner";
+                btnToggle.classList.add("btn-danger");
+                btnSwitch.style.display = "inline-flex";
+                statusLabel.textContent = "🟢 Escaneando...";
+            }).catch(err => {
+                console.error("Error al iniciar cámara:", err);
+                statusLabel.textContent = "❌ Error / Permiso denegado";
+                alert("No se pudo acceder a la cámara. Comprueba los permisos de tu navegador o utiliza el buscador manual.");
+            });
+        }
+
+        function stopScanner() {
+            if (html5QrCode && isScanning) {
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    const btnToggle = document.getElementById("btn-toggle");
+                    const btnSwitch = document.getElementById("btn-switch-cam");
+                    const statusLabel = document.getElementById("scanner-status");
+
+                    btnToggle.innerHTML = "▶ Activar Escáner";
+                    btnToggle.classList.remove("btn-danger");
+                    btnSwitch.style.display = "none";
+                    statusLabel.textContent = "Inactivo";
+                }).catch(err => console.error(err));
+            }
+        }
+
+        function switchCamera() {
+            if (isScanning) {
+                stopScanner();
+                currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+                setTimeout(() => startScanner(), 400);
+            }
+        }
+
+        function onScanSuccess(decodedText) {
+            playBeep();
+            if (navigator.vibrate) navigator.vibrate(100);
+            displayBeerResult(decodedText);
+            stopScanner();
+        }
+
+        function onScanFailure(error) {}
+
+        function displayBeerResult(query) {
+            const cleanQuery = query.trim().toLowerCase();
+            const beer = beerDatabase.find(b => 
+                b.ean === cleanQuery || 
+                b.name.toLowerCase().includes(cleanQuery) || 
+                b.brand.toLowerCase().includes(cleanQuery)
+            );
+
+            const container = document.getElementById("result-container");
+
+            if (beer) {
+                document.getElementById("res-name").textContent = beer.name;
+                document.getElementById("res-brand").textContent = beer.brand;
+                document.getElementById("res-ean").textContent = "EAN: " + beer.ean;
+                document.getElementById("res-style").textContent = beer.style;
+                document.getElementById("res-abv").textContent = beer.abv;
+                document.getElementById("res-origin").textContent = beer.origin;
+                document.getElementById("res-ingredients").textContent = beer.ingredients;
+
+                const badge = document.getElementById("res-pureza-badge");
+                if (beer.pureza1516) {
+                    badge.className = "pureza-badge cumple";
+                    badge.innerHTML = "✓ Cumple la Ley de Pureza Alemana (100% Malta y Sin Adjuntos)";
+                } else {
+                    badge.className = "pureza-badge no-cumple";
+                    badge.innerHTML = "⚠️ NO cumple la Ley de Pureza Alemana (" + beer.reason + ")";
+                }
+
+                const affLink = document.getElementById("res-affiliate");
+                if (beer.amazonUrl) {
+                    affLink.href = beer.amazonUrl;
+                    affLink.style.display = "block";
+                } else {
+                    affLink.style.display = "none";
+                }
+
+                container.style.display = "block";
+                container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                alert("No se encontró ninguna cerveza registrada con el código o búsqueda: " + query);
+            }
+        }
+
+        function performSearch() {
+            const query = document.getElementById("search-input").value;
+            if (!query) {
+                alert("Introduce un término o código EAN-13 para buscar.");
+                return;
+            }
+            displayBeerResult(query);
+        }
+
+        function renderCatalog(list) {
+            const grid = document.getElementById("catalog-grid");
+            const count = document.getElementById("catalog-count");
+            grid.innerHTML = "";
+            count.textContent = list.length + " cervezas analizadas";
+
+            list.forEach(beer => {
+                const card = document.createElement("div");
+                card.className = "catalog-item";
+                card.onclick = () => displayBeerResult(beer.ean);
+
+                const purezaTag = beer.pureza1516 
+                    ? '<span class="tag-sm tag-pureza-yes">✓ Ley 1516</span>' 
+                    : '<span class="tag-sm tag-pureza-no">✕ Adjuntos</span>';
+
                 card.innerHTML = `
-                    <div>
-                        <h3>${cerveza.nombre}</h3>
-                        <div class="brewery">${cerveza.marca} • ${cerveza.origen}</div>
-                        <span class="badge ${cerveza.cumple_ley_pureza ? 'pure' : 'adjuncts'}">
-                            ${cerveza.cumple_ley_pureza ? '✓ Cumple Ley Pureza 1516' : '✕ Contiene Adjuntos'}
-                        </span>
-                        <ul class="details-list">
-                            <li><strong>Estilo:</strong> ${cerveza.estilo}</li>
-                            <li><strong>Graduación:</strong> ${cerveza.alcohol}</li>
-                            <li><strong>Ingredientes:</strong> ${cerveza.ingredientes.join(', ')}</li>
-                        </ul>
+                    <div class="catalog-item-name">${beer.name}</div>
+                    <div class="catalog-item-sub">${beer.brand} · ${beer.origin}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:0.8rem; font-family:monospace; color:var(--text-muted);">${beer.ean}</span>
+                        ${purezaTag}
                     </div>
-                    <button class="btn-modal" onclick="abrirModal(${cerveza.id})">Ver ficha detallada</button>
                 `;
-                beerGrid.appendChild(card);
+                grid.appendChild(card);
             });
         }
-
-        // Actualizar Sugerencias en tiempo real
-        function actualizarSugerencias() {
-            const query = searchInput.value;
-            const normQuery = normalizar(query);
-
-            if (normQuery.length < 1) {
-                suggestionsList.style.display = 'none';
-                return;
-            }
-
-            const Coincidencias = baseDatosCervezas.filter(c => buscarEnCerveza(c, query));
-
-            if (Coincidencias.length === 0) {
-                suggestionsList.style.display = 'none';
-                return;
-            }
-
-            suggestionsList.innerHTML = '';
-            Coincidencias.forEach(cerveza => {
-                const item = document.createElement('div');
-                item.className = 'suggestion-item';
-                item.innerHTML = `
-                    <span><strong>${cerveza.nombre}</strong></span>
-                    <span class="brand">${cerveza.marca}</span>
-                `;
-                item.addEventListener('click', () => {
-                    searchInput.value = cerveza.nombre;
-                    suggestionsList.style.display = 'none';
-                    clearBtn.style.display = 'block';
-                    renderResultados();
-                });
-                suggestionsList.appendChild(item);
-            });
-
-            suggestionsList.style.display = 'block';
-        }
-
-        // ==========================================
-        // FUNCIONES DE MODAL
-        // ==========================================
-        window.abrirModal = function(id) {
-            const cerveza = baseDatosCervezas.find(c => c.id === id);
-            if (!cerveza) return;
-
-            document.getElementById('modalTitle').textContent = cerveza.nombre;
-            document.getElementById('modalBrewery').textContent = `${cerveza.marca} (${cerveza.origen})`;
-            
-            const badge = document.getElementById('modalBadge');
-            badge.className = `badge ${cerveza.cumple_ley_pureza ? 'pure' : 'adjuncts'}`;
-            badge.textContent = cerveza.cumple_ley_pureza 
-                ? '✓ Cumple estrictamente la Ley de Pureza Alemana (Reinheitsgebot)' 
-                : '✕ No cumple la Ley de Pureza (Contiene adjuntos o aditivos)';
-
-            document.getElementById('modalStyleOrigin').textContent = `${cerveza.estilo} | Graduación: ${cerveza.alcohol}`;
-            document.getElementById('modalIngredients').textContent = cerveza.ingredientes.join(', ');
-            document.getElementById('modalAdjunctsDetail').textContent = cerveza.adjuntos_detalle;
-            document.getElementById('modalEAN').textContent = cerveza.ean;
-
-            modalOverlay.style.display = 'flex';
-        };
-
-        function cerrarModal() {
-            modalOverlay.style.display = 'none';
-        }
-
-        // ==========================================
-        // EVENT LISTENERS
-        // ==========================================
-
-        searchInput.addEventListener('input', () => {
-            const value = searchInput.value;
-            clearBtn.style.display = value ? 'block' : 'none';
-            actualizarSugerencias();
-            renderResultados();
-        });
-
-        clearBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            clearBtn.style.display = 'none';
-            suggestionsList.style.display = 'none';
-            renderResultados();
-            searchInput.focus();
-        });
-
-        // Ocultar sugerencias si se hace clic fuera
-        document.addEventListener('click', (e) => {
-            if (!searchInput.contains(e.target) && !suggestionsList.contains(e.target)) {
-                suggestionsList.style.display = 'none';
-            }
-        });
-
-        // Botones de filtro
-        tagButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                tagButtons.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                filtroActual = btn.getAttribute('data-filter');
-                renderResultados();
-            });
-        });
-
-        // Control Modal
-        modalClose.addEventListener('click', cerrarModal);
-        modalOverlay.addEventListener('click', (e) => {
-            if (e.target === modalOverlay) cerrarModal();
-        });
-
-        // Carga inicial
-        renderResultados();
     </script>
 </body>
 </html>
