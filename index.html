@@ -7,24 +7,33 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         :root {
-            --bg-color: #121214;
-            --card-bg: #1e1e24;
+            --bg-color: #0b0c10;
+            --card-bg: #15171e;
+            --card-border: #232733;
             --primary-amber: #f39c12;
             --accent-gold: #d35400;
+            --primary-glow: rgba(243, 156, 18, 0.25);
             --text-main: #f5f6fa;
-            --text-muted: #a4b0be;
-            --success: #2ed573;
-            --danger: #ff4757;
+            --text-muted: #9ca3af;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius: 12px;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.2s, border-color 0.2s, transform 0.2s;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 15px;
+            padding: 20px 15px;
             display: flex;
             justify-content: center;
+            min-height: 100vh;
         }
 
         .container {
@@ -34,163 +43,252 @@
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .header h1 {
             color: var(--primary-amber);
             margin: 0;
-            font-size: 1.8rem;
-        }
-
-        .header p {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-top: 5px;
-        }
-
-        .btn-audio {
-            background: #2f3542;
-            color: var(--text-main);
-            border: 1px solid #57606f;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-audio.active {
-            background: var(--primary-amber);
-            color: #121214;
-            font-weight: bold;
-            border-color: var(--primary-amber);
-        }
-
-        .search-card {
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-        }
-
-        .btn-camera {
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary-amber), var(--accent-gold));
-            color: #fff;
-            border: none;
-            padding: 14px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-bottom: 12px;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
         }
 
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 6px;
+        }
+
+        .audio-wrapper {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-audio {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            border: 1px solid var(--card-border);
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-audio:hover {
+            border-color: var(--primary-amber);
+            color: var(--text-main);
+        }
+
+        .btn-audio.active {
+            background: var(--primary-amber);
+            color: #0b0c10;
+            font-weight: 700;
+            border-color: var(--primary-amber);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            width: 100%;
+            border: none;
+            padding: 14px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-camera {
+            background: linear-gradient(135deg, var(--primary-amber), var(--accent-gold));
+            color: #fff;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .btn-camera:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background: #232733;
+            color: var(--text-main);
+            border: 1px solid #343a4a;
+            margin-top: 8px;
+        }
+
         .input-search {
             width: 100%;
-            padding: 12px;
-            background: #2f3542;
-            border: 1px solid #57606f;
+            padding: 14px;
+            background: #0f1015;
+            border: 1px solid var(--card-border);
             border-radius: 8px;
             color: #fff;
             font-size: 0.95rem;
-            box-sizing: border-box;
+            margin-top: 12px;
+            outline: none;
+        }
+
+        .input-search:focus {
+            border-color: var(--primary-amber);
+            box-shadow: 0 0 0 2px var(--primary-glow);
         }
 
         #reader {
             width: 100%;
             border-radius: 8px;
             overflow: hidden;
-            margin-bottom: 12px;
+            margin-top: 12px;
+            background: #000;
+            border: 1px solid var(--card-border);
+        }
+
+        #reader video {
+            object-fit: cover;
         }
 
         .result-card {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
             display: none;
-            border: 1px solid #333;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .badge {
-            display: inline-block;
-            padding: 6px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
             border-radius: 20px;
             font-size: 0.75rem;
-            font-weight: bold;
-            margin-bottom: 12px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+            text-transform: uppercase;
         }
 
-        .badge-success { background: rgba(46, 213, 115, 0.2); color: var(--success); border: 1px solid var(--success); }
-        .badge-danger { background: rgba(255, 71, 87, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+        .badge-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
 
-        .beer-title { margin: 0 0 5px 0; font-size: 1.4rem; }
-        
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .beer-title {
+            margin: 0 0 12px 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
         .meta-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            background: #141418;
-            padding: 12px;
+            gap: 12px;
+            background: #0f1015;
+            padding: 14px;
             border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 0.85rem;
-            margin: 15px 0;
+            margin: 16px 0;
         }
 
-        .meta-grid div { color: var(--text-muted); }
-        .meta-grid strong { color: var(--text-main); display: block; }
+        .meta-item label {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 2px;
+        }
 
-        .cross-sell {
-            background: rgba(243, 156, 18, 0.1);
-            border: 1px dashed var(--primary-amber);
+        .meta-item strong {
+            color: var(--text-main);
+            font-size: 0.95rem;
+        }
+
+        .analysis-block {
+            background: rgba(255, 255, 255, 0.02);
             padding: 12px;
             border-radius: 8px;
-            margin: 15px 0;
+            border-left: 3px solid var(--primary-amber);
+            margin-bottom: 16px;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: #d1d5db;
+        }
+
+        .analysis-block strong {
+            color: var(--text-main);
+        }
+
+        .cross-sell {
+            background: rgba(243, 156, 18, 0.08);
+            border: 1px dashed var(--primary-amber);
+            padding: 14px;
+            border-radius: 8px;
+            margin: 16px 0;
             font-size: 0.85rem;
         }
 
         .btn-affiliate {
-            display: block;
             background: #ff9900;
             color: #111;
-            text-align: center;
-            padding: 12px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
             margin-top: 10px;
         }
 
         .btn-whatsapp {
-            display: block;
             background: #25D366;
             color: #fff;
-            text-align: center;
-            padding: 12px;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
             margin-top: 10px;
         }
 
         .btn-kofi {
             display: block;
-            background: #2980b9;
-            color: white;
+            background: #1e293b;
+            border: 1px solid #334155;
+            color: var(--text-main);
             text-align: center;
-            padding: 14px;
+            padding: 16px;
             text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
-            margin-top: 25px;
-            font-size: 0.85rem;
-            line-height: 1.4;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-top: 24px;
+        }
+
+        .btn-kofi:hover {
+            border-color: var(--primary-amber);
         }
     </style>
 </head>
@@ -198,60 +296,60 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍺 PacoliScannerHonesta</h1>
+        <h1>🍺 PacoliScanner</h1>
         <p>El escáner independiente de pureza cervecera</p>
     </div>
 
-    <!-- Control de Música de Fondo -->
-    <div style="text-align: center; margin-bottom: 15px;">
+    <div class="audio-wrapper">
         <button id="btn-audio" class="btn-audio" onclick="toggleMusica()">🎵 Música: OFF</button>
     </div>
     <audio id="bg-music" loop src="musica.mp3"></audio>
 
-    <div class="search-card">
-        <button class="btn-camera" onclick="toggleCamera()">📷 Activar Escáner con Cámara</button>
+    <div class="card">
+        <button id="btn-toggle-cam" class="btn btn-camera" onclick="toggleCamera()">📷 Activar Escáner</button>
+        <button id="btn-switch-cam" class="btn btn-secondary" style="display:none;" onclick="cambiarCamara()">🔄 Cambiar Cámara</button>
         <div id="reader"></div>
         <input type="text" id="buscador" class="input-search" placeholder="Escribe marca o escanea EAN-13..." oninput="buscarManual()">
     </div>
 
-    <div id="resultado" class="result-card">
+    <div id="resultado" class="card result-card">
         <div id="r-badge" class="badge"></div>
         <h2 id="r-marca" class="beer-title"></h2>
         
         <div class="meta-grid">
-            <div>Grupo: <strong id="r-grupo"></strong></div>
-            <div>Fabricante: <strong id="r-fabricante"></strong></div>
-            <div>Origen: <strong id="r-origen"></strong></div>
-            <div>Puntuación: <strong id="r-puntuacion"></strong></div>
+            <div class="meta-item"><label>Grupo</label><strong id="r-grupo"></strong></div>
+            <div class="meta-item"><label>Fabricante</label><strong id="r-fabricante"></strong></div>
+            <div class="meta-item"><label>Origen</label><strong id="r-origen"></strong></div>
+            <div class="meta-item"><label>Puntuación</label><strong id="r-puntuacion"></strong></div>
         </div>
 
-        <p style="font-size: 0.85rem; color: var(--text-muted);">
-            <strong style="color:var(--text-main);">Ingredientes:</strong> <span id="r-ingredientes"></span>
-        </p>
-        <p style="font-size: 0.85rem; color: var(--text-muted);">
-            <strong style="color:var(--text-main);">Análisis:</strong> <span id="r-veredicto"></span>
-        </p>
+        <div class="analysis-block">
+            <strong>Ingredientes:</strong> <span id="r-ingredientes"></span>
+        </div>
+        <div class="analysis-block">
+            <strong>Análisis:</strong> <span id="r-veredicto"></span>
+        </div>
 
         <div id="r-cross-sell" class="cross-sell" style="display:none;">
             <strong style="color: var(--primary-amber);">⚠️ Alternativa 100% Malta recomendada</strong>
-            <p style="margin: 5px 0 0 0; color: var(--text-muted);">Evita los adjuntos industriales con esta opción recomendada:</p>
-            <a id="r-cross-link" class="btn-affiliate" href="#" target="_blank">🛒 Ver oferta de Voll-Damm en Amazon</a>
+            <p style="margin: 6px 0 0 0; color: var(--text-muted);">Evita los adjuntos industriales con esta opción recomendada:</p>
+            <a id="r-cross-link" class="btn btn-affiliate" href="#" target="_blank">🛒 Ver oferta recomendada</a>
         </div>
 
-        <a id="r-compra-directa" class="btn-affiliate" href="#" target="_blank">🛒 Buscar esta PacoliScanner en Amazon</a>
-        <a id="r-whatsapp" class="btn-whatsapp" href="#" target="_blank">📲 Compartir resultado en WhatsApp</a>
+        <a id="r-compra-directa" class="btn btn-affiliate" href="#" target="_blank">🛒 Buscar esta cerveza en Amazon</a>
+        <a id="r-whatsapp" class="btn btn-whatsapp" href="#" target="_blank">📲 Compartir resultado en WhatsApp</a>
     </div>
 
     <a href="https://ko-fi.com/tu_usuario" class="btn-kofi" target="_blank">
-        ¿Te he salvado de beber maíz hoy?<br>
-        <span style="font-weight: normal; opacity: 0.8;">Invítame a una PacoliScanner 100% malta para mantener la web libre de marcas industriales.</span>
+        <strong>¿Te he salvado de beber maíz hoy?</strong><br>
+        <span style="color: var(--text-muted); font-weight: normal;">Invítame a una cerveza 100% malta para mantener PacoliScanner libre de marcas industriales.</span>
     </a>
 </div>
 
 <script>
     const TAG_AFILIADO = "tu_tag_afiliado-21";
 
-    const baseDatosPacoliScanners = [
+    const baseDatosCervezas = [
         {
             ean: "8411090101331",
             marca: "Cruzcampo Pilsen",
@@ -304,7 +402,7 @@
             ean: "8410014001925",
             marca: "Alhambra Reserva 1925",
             grupo: "Mahou-San Miguel",
-            fabricante_real: "PacoliScanners Alhambra S.L.",
+            fabricante_real: "Cervezas Alhambra S.L.",
             origen: "Granada, España",
             puntuacion: 70,
             ley_pureza_cumple: false,
@@ -326,7 +424,8 @@
         }
     ];
 
-    let html5QrcodeScanner = null;
+    let html5QrCode = null;
+    let currentFacingMode = "environment";
 
     function renderizarResultado(c) {
         const card = document.getElementById("resultado");
@@ -342,25 +441,26 @@
 
         if (c.ley_pureza_cumple) {
             badge.className = "badge badge-success";
-            badge.innerText = "✓ CUMPLE LA LEY DE PUREZA (1516)";
+            badge.innerText = "✓ Cumple Ley de Pureza (1516)";
             document.getElementById("r-cross-sell").style.display = "none";
         } else {
             badge.className = "badge badge-danger";
-            badge.innerText = "✕ SUSPENDE LA LEY DE PUREZA";
+            badge.innerText = "✕ Suspende Ley de Pureza";
             
             const crossLink = document.getElementById("r-cross-link");
-            crossLink.href = `https://www.amazon.es/s?k=PacoliScanner+Voll+Damm&tag=${TAG_AFILIADO}`;
+            crossLink.href = `https://www.amazon.es/s?k=Cerveza+Voll+Damm&tag=${TAG_AFILIADO}`;
             document.getElementById("r-cross-sell").style.display = "block";
         }
 
-        const amazonUrl = `https://www.amazon.es/s?k=PacoliScanner+${encodeURIComponent(c.marca)}&tag=${TAG_AFILIADO}`;
+        const amazonUrl = `https://www.amazon.es/s?k=Cerveza+${encodeURIComponent(c.marca)}&tag=${TAG_AFILIADO}`;
         document.getElementById("r-compra-directa").href = amazonUrl;
 
         const urlApp = window.location.href;
-        const textoWA = `Increíble: Mi ${c.marca} saca un ${c.puntuacion}/100 en PacoliScannerHonesta porque lleva ${c.adjuntos_detalle}. Escanea la tuya aquí: ${urlApp}`;
+        const textoWA = `Increíble: Mi ${c.marca} saca un ${c.puntuacion}/100 en PacoliScanner porque lleva ${c.adjuntos_detalle}. Escanea la tuya aquí: ${urlApp}`;
         document.getElementById("r-whatsapp").href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoWA)}`;
 
         card.style.display = "block";
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function buscarManual() {
@@ -369,30 +469,69 @@
             document.getElementById("resultado").style.display = "none";
             return;
         }
-        const encontrada = baseDatosPacoliScanners.find(c => 
+        const encontrada = baseDatosCervezas.find(c => 
             c.ean.includes(query) || c.marca.toLowerCase().includes(query)
         );
         if (encontrada) renderizarResultado(encontrada);
     }
 
-    function toggleCamera() {
-        if (html5QrcodeScanner) {
-            html5QrcodeScanner.clear();
-            html5QrcodeScanner = null;
-            document.getElementById("reader").innerHTML = "";
+    async function toggleCamera() {
+        if (html5QrCode && html5QrCode.isScanning) {
+            await detenerCamara();
             return;
         }
-        
-        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-        html5QrcodeScanner.render((decodedText) => {
-            const encontrada = baseDatosPacoliScanners.find(c => c.ean === decodedText);
-            if (encontrada) {
-                renderizarResultado(encontrada);
-                html5QrcodeScanner.clear();
-            } else {
-                alert(`Código EAN ${decodedText} leído, pero no figura en la base de datos local.`);
-            }
+
+        if (!html5QrCode) {
+            html5QrCode = new Html5Qrcode("reader");
+        }
+
+        iniciarEscaneo();
+    }
+
+    function iniciarEscaneo() {
+        const btnToggle = document.getElementById("btn-toggle-cam");
+        const btnSwitch = document.getElementById("btn-switch-cam");
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+        html5QrCode.start(
+            { facingMode: currentFacingMode },
+            config,
+            (decodedText) => {
+                const encontrada = baseDatosCervezas.find(c => c.ean === decodedText);
+                if (encontrada) {
+                    renderizarResultado(encontrada);
+                    detenerCamara();
+                } else {
+                    alert(`Código EAN ${decodedText} leído, pero no figura en la base de datos.`);
+                }
+            },
+            () => {}
+        ).then(() => {
+            btnToggle.innerText = "⏹️ Detener Escáner";
+            btnSwitch.style.display = "flex";
+        }).catch(err => {
+            console.error(err);
+            alert("No se pudo acceder a la cámara.");
         });
+    }
+
+    async function detenerCamara() {
+        const btnToggle = document.getElementById("btn-toggle-cam");
+        const btnSwitch = document.getElementById("btn-switch-cam");
+
+        if (html5QrCode && html5QrCode.isScanning) {
+            await html5QrCode.stop();
+            btnToggle.innerText = "📷 Activar Escáner";
+            btnSwitch.style.display = "none";
+        }
+    }
+
+    async function cambiarCamara() {
+        if (html5QrCode && html5QrCode.isScanning) {
+            currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+            await html5QrCode.stop();
+            iniciarEscaneo();
+        }
     }
 
     function toggleMusica() {
@@ -403,8 +542,8 @@
             audio.play().then(() => {
                 btn.innerText = "🔊 Música: ON";
                 btn.classList.add("active");
-            }).catch(err => {
-                alert("Asegúrate de subir un archivo de audio llamado musica.mp3 a la raíz del repositorio.");
+            }).catch(() => {
+                alert("Asegúrate de incluir 'musica.mp3' en la raíz de la web.");
             });
         } else {
             audio.pause();
