@@ -49,6 +49,31 @@
         /* Ocultar scrollbar pero permitir scroll */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* ========================================================================= */
+        /* HABILITAR SCROLL NATIVO PARA OCULTAR BARRA URL AL DESLIZAR */
+        /* ========================================================================= */
+        html, body {
+            position: static !important; /* Desbloquea la página */
+            height: auto !important; 
+            min-height: 100vh !important;
+            min-height: 100dvh !important; /* Altura dinámica (ignora barras del navegador) */
+            overflow: visible !important; /* Devuelve el scroll al navegador */
+        }
+        main {
+            overflow: visible !important;
+            flex: none !important; 
+            padding-bottom: 120px !important; /* Espacio extra para el menú inferior */
+        }
+        header {
+            position: sticky !important; /* Mantiene la cabecera visible tipo App */
+            top: 0 !important;
+            z-index: 45 !important;
+            background: rgba(15, 23, 42, 0.85) !important;
+            backdrop-filter: blur(12px) !important;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        /* ========================================================================= */
     </style>
 </head>
 <body class="app-gradient text-slate-100 h-screen w-full overflow-hidden flex flex-col font-sans selection:bg-amber-500 selection:text-slate-900">
