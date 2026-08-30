@@ -343,15 +343,6 @@
         lucide.createIcons();
 
         // -------------------------------------------------------------
-        // HACK PARA OCULTAR BARRA URL EN MÓVILES
-        // -------------------------------------------------------------
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                window.scrollTo(0, 1);
-            }, 100);
-        });
-
-        // -------------------------------------------------------------
         // REGISTRO AUTOMÁTICO DE SERVICE WORKER PARA FORZAR MODO PWA
         // -------------------------------------------------------------
         if ('serviceWorker' in navigator) {
