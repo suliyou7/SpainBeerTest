@@ -83,7 +83,7 @@
         
         <section id="tab-home" class="space-y-6 fade-in">
             
-            <div class="relative z-20">
+            <div class="relative z-20">  
                 <div class="flex items-center p-3 transition card-glass rounded-2xl space-x-3 focus-within:border-amber-500/50">
                     <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
                     <input type="text" id="searchInput" oninput="searchBeers()" placeholder="Buscar cerveza o EAN..." 
@@ -241,8 +241,23 @@
             </button>
 
             <button onclick="openScanner()" class="absolute left-1/2 -top-6 transform -translate-x-1/2 bg-gradient-to-b from-amber-400 to-amber-600 p-4 rounded-full shadow-[0_4px_20px_rgba(245,158,11,0.4)] border-4 border-slate-900 text-slate-900 active:scale-95 transition-transform z-50">
-                <i data-lucide="scan-barcode" class="w-7 h-7"></i>
-            </button>
+    <!-- SVG Personalizado para mayor definición y densidad de barras -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-9 h-9">
+        <!-- Marco de escaneo (esquinas) -->
+        <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+        <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+        <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+        <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+        
+        <!-- Código de barras denso -->
+        <path d="M7 8v8" stroke-width="1.5"></path>
+        <path d="M9 8v8" stroke-width="2"></path>
+        <path d="M11 8v8" stroke-width="1"></path>
+        <path d="M12.5 8v8" stroke-width="3"></path>
+        <path d="M15 8v8" stroke-width="1"></path>
+        <path d="M16.5 8v8" stroke-width="2"></path>
+    </svg>
+</button>
         </div>
     </nav>
 
