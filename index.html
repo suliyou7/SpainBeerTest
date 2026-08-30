@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CervezaHonesta | Escáner de Pureza Cervecera</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --card-bg: #1e1e24;
+            --primary-amber: #f39c12;
+            --accent-gold: #d35400;
+            --text-main: #f5f6fa;
+            --text-muted: #a4b0be;
+            --success: #2ed573;
+            --danger: #ff4757;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: var(--primary-amber);
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        .search-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .btn-camera {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-amber), var(--accent-gold));
+            color: #fff;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .input-search {
+            width: 100%;
+            padding: 12px;
+            background: #2f3542;
+            border: 1px solid #57606f;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+        }
+
+        #reader {
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            display: none;
+            border: 1px solid #333;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .badge-success { background: rgba(46, 213, 115, 0.2); color: var(--success); border: 1px solid var(--success); }
+        .badge-danger { background: rgba(255, 71, 87, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+
+        .beer-title { margin: 0 0 5px 0; font-size: 1.4rem; }
+        
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            background: #141418;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin: 15px 0;
+        }
+
+        .meta-grid div { color: var(--text-muted); }
+        .meta-grid strong { color: var(--text-main); display: block; }
+
+        .cross-sell {
+            background: rgba(243, 156, 18, 0.1);
+            border: 1px dashed var(--primary-amber);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.85rem;
+        }
+
+        .btn-affiliate {
+            display: block;
+            background: #ff9900;
+            color: #111;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .btn-whatsapp {
+            display: block;
+            background: #25D366;
+            color: #fff;
+            text-align: center;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .btn-kofi {
+            display: block;
+            background: #2980b9;
+            color: white;
+            text-align: center;
+            padding: 14px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin-top: 25px;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>🍺 CervezaHonesta</h1>
+        <p>El escáner independiente de pureza cervecera</p>
+    </div>
+
+    <div class="search-card">
+        <button class="btn-camera" onclick="toggleCamera()">📷 Activar Escáner con Cámara</button>
+        <div id="reader"></div>
+        <input type="text" id="buscador" class="input-search" placeholder="Escribe marca o escanea EAN-13..." oninput="buscarManual()">
+    </div>
+
+    <div id="resultado" class="result-card">
+        <div id="r-badge" class="badge"></div>
+        <h2 id="r-marca" class="beer-title"></h2>
+        
+        <div class="meta-grid">
+            <div>Grupo: <strong id="r-grupo"></strong></div>
+            <div>Fabricante: <strong id="r-fabricante"></strong></div>
+            <div>Origen: <strong id="r-origen"></strong></div>
+            <div>Puntuación: <strong id="r-puntuacion"></strong></div>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+            <strong style="color:var(--text-main);">Ingredientes:</strong> <span id="r-ingredientes"></span>
+        </p>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">
+            <strong style="color:var(--text-main);">Análisis:</strong> <span id="r-veredicto"></span>
+        </p>
+
+        <div id="r-cross-sell" class="cross-sell" style="display:none;">
+            <strong style="color: var(--primary-amber);">⚠️ Alternativa 100% Malta recomendada</strong>
+            <p style="margin: 5px 0 0 0; color: var(--text-muted);">Evita los adjuntos industriales con esta opción recomendada:</p>
+            <a id="r-cross-link" class="btn-affiliate" href="#" target="_blank">🛒 Ver oferta de Voll-Damm en Amazon</a>
+        </div>
+
+        <a id="r-compra-directa" class="btn-affiliate" href="#" target="_blank">🛒 Buscar esta cerveza en Amazon</a>
+        <a id="r-whatsapp" class="btn-whatsapp" href="#" target="_blank">📲 Compartir resultado en WhatsApp</a>
+    </div>
+
+    <a href="https://ko-fi.com/tu_usuario" class="btn-kofi" target="_blank">
+        ¿Te he salvado de beber maíz hoy?<br>
+        <span style="font-weight: normal; opacity: 0.8;">Invítame a una cerveza 100% malta para mantener la web libre de marcas industriales.</span>
+    </a>
+</div>
+
+<script>
+    const TAG_AFILIADO = "tu_tag_afiliado-21"; // Cambia esto por tu ID de Amazon Afiliados cuando lo tengas
+
+    const baseDatosCervezas = [
+        {
+            ean: "8411090101331",
+            marca: "Cruzcampo Pilsen",
+            grupo: "Heineken España S.A.",
+            fabricante_real: "Heineken España S.A.",
+            origen: "Sevilla, España",
+            puntuacion: 40,
+            ley_pureza_cumple: false,
+            adjuntos_detalle: "Maíz y Extracto de lúpulo",
+            ingredientes: ["Agua", "Malta de cebada", "Maíz", "Extracto de lúpulo", "Levadura"],
+            veredicto: "Contiene maíz para abaratar costes. El uso de extracto de lúpulo aporta un amargor industrial más seco."
+        },
+        {
+            ean: "8410560000010",
+            marca: "Voll-Damm",
+            grupo: "Grupo Damm",
+            fabricante_real: "Sociedad Anónima Damm",
+            origen: "Barcelona, España",
+            puntuacion: 95,
+            ley_pureza_cumple: true,
+            adjuntos_detalle: "Ninguno",
+            ingredientes: ["Agua", "100% Malta de cebada", "Lúpulo", "Levadura"],
+            veredicto: "Cumple la Ley de Pureza Alemana. Doble malta genuina con gran cuerpo, retención de espuma y amargor noble."
+        },
+        {
+            ean: "8410014000010",
+            marca: "Mahou Cinco Estrellas",
+            grupo: "Mahou-San Miguel",
+            fabricante_real: "Mahou S.A.",
+            origen: "Madrid, España",
+            puntuacion: 48,
+            ley_pureza_cumple: false,
+            adjuntos_detalle: "Maíz",
+            ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo", "Levadura"],
+            veredicto: "Añade maíz para aligerar el cuerpo. Mantiene un sabor seco característico, pero suspende la Ley de Pureza."
+        },
+        {
+            ean: "8410820000010",
+            marca: "Estrella Galicia Especial",
+            grupo: "Hijos de Rivera S.A.",
+            fabricante_real: "Hijos de Rivera S.A.",
+            origen: "A Coruña, España",
+            puntuacion: 65,
+            ley_pureza_cumple: false,
+            adjuntos_detalle: "Maíz",
+            ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo", "Levadura"],
+            veredicto: "Lleva maíz en su receta base, aunque su maduración más lenta logra disimular el adjunto con un sabor muy equilibrado."
+        },
+        {
+            ean: "8410014001925",
+            marca: "Alhambra Reserva 1925",
+            grupo: "Mahou-San Miguel",
+            fabricante_real: "Cervezas Alhambra S.L.",
+            origen: "Granada, España",
+            puntuacion: 70,
+            ley_pureza_cumple: false,
+            adjuntos_detalle: "Maíz",
+            ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo", "Levadura"],
+            veredicto: "Utiliza maíz para equilibrar el grado alcohólico, pero ofrece cuerpo y perfil aromático destacables."
+        },
+        {
+            ean: "8714100000010",
+            marca: "Heineken",
+            grupo: "Heineken N.V.",
+            fabricante_real: "Heineken España / N.V.",
+            origen: "Países Bajos / España",
+            puntuacion: 85,
+            ley_pureza_cumple: true,
+            adjuntos_detalle: "Ninguno",
+            ingredientes: ["Agua", "100% Malta de cebada", "Lúpulo", "Levadura A-Yeast"],
+            veredicto: "Cumple la Ley de Pureza de 1516. 100% malta con fermentación en tanques horizontales."
+        }
+    ];
+
+    let html5QrcodeScanner = null;
+
+    function renderizarResultado(c) {
+        const card = document.getElementById("resultado");
+        const badge = document.getElementById("r-badge");
+        
+        document.getElementById("r-marca").innerText = c.marca;
+        document.getElementById("r-grupo").innerText = c.grupo;
+        document.getElementById("r-fabricante").innerText = c.fabricante_real;
+        document.getElementById("r-origen").innerText = c.origen;
+        document.getElementById("r-puntuacion").innerText = `${c.puntuacion}/100`;
+        document.getElementById("r-ingredientes").innerText = c.ingredientes.join(", ");
+        document.getElementById("r-veredicto").innerText = c.veredicto;
+
+        if (c.ley_pureza_cumple) {
+            badge.className = "badge badge-success";
+            badge.innerText = "✓ CUMPLE LA LEY DE PUREZA (1516)";
+            document.getElementById("r-cross-sell").style.display = "none";
+        } else {
+            badge.className = "badge badge-danger";
+            badge.innerText = "✕ SUSPENDE LA LEY DE PUREZA";
+            
+            const crossLink = document.getElementById("r-cross-link");
+            crossLink.href = `https://www.amazon.es/s?k=Cerveza+Voll+Damm&tag=${TAG_AFILIADO}`;
+            document.getElementById("r-cross-sell").style.display = "block";
+        }
+
+        const amazonUrl = `https://www.amazon.es/s?k=Cerveza+${encodeURIComponent(c.marca)}&tag=${TAG_AFILIADO}`;
+        document.getElementById("r-compra-directa").href = amazonUrl;
+
+        const urlApp = window.location.href;
+        const textoWA = `Increíble: Mi ${c.marca} saca un ${c.puntuacion}/100 en CervezaHonesta porque lleva ${c.adjuntos_detalle}. Escanea la tuya aquí: ${urlApp}`;
+        document.getElementById("r-whatsapp").href = `https://api.whatsapp.com/send?text=${encodeURIComponent(textoWA)}`;
+
+        card.style.display = "block";
+    }
+
+    function buscarManual() {
+        const query = document.getElementById("buscador").value.toLowerCase().trim();
+        if (query.length < 3) {
+            document.getElementById("resultado").style.display = "none";
+            return;
+        }
+        const encontrada = baseDatosCervezas.find(c => 
+            c.ean.includes(query) || c.marca.toLowerCase().includes(query)
+        );
+        if (encontrada) renderizarResultado(encontrada);
+    }
+
+    function toggleCamera() {
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.clear();
+            html5QrcodeScanner = null;
+            document.getElementById("reader").innerHTML = "";
+            return;
+        }
+        
+        html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+        html5QrcodeScanner.render((decodedText) => {
+            const encontrada = baseDatosCervezas.find(c => c.ean === decodedText);
+            if (encontrada) {
+                renderizarResultado(encontrada);
+                html5QrcodeScanner.clear();
+            } else {
+                alert(`Código EAN ${decodedText} leído, pero no figura en la base de datos local.`);
+            }
+        });
+    }
+</script>
+</body>
+</html>
