@@ -346,15 +346,15 @@
         <div id="r-cross-sell" class="cross-sell" style="display:none;">
             <strong style="color: var(--primary-amber);">⚠️ Alternativa 100% Malta recomendada</strong>
             <p style="margin: 6px 0 0 0; color: var(--text-muted);">Evita los adjuntos industriales con esta opción recomendada:</p>
-            <a id="r-cross-link" class="btn btn-affiliate" href="#" target="_blank">🛒 Ver oferta recomendada</a>
+            <a id="r-cross-link" class="btn btn-affiliate" href="#" target="_blank" rel="noopener noreferrer">🛒 Ver oferta recomendada</a>
         </div>
 
-        <a id="r-compra-directa" class="btn btn-affiliate" href="#" target="_blank">🛒 Buscar esta cerveza en Amazon</a>
-        <a id="r-whatsapp" class="btn btn-whatsapp" href="#" target="_blank">📲 Compartir resultado en WhatsApp</a>
+        <a id="r-compra-directa" class="btn btn-affiliate" href="#" target="_blank" rel="noopener noreferrer">🛒 Buscar esta cerveza en Amazon</a>
+        <a id="r-whatsapp" class="btn btn-whatsapp" href="#" target="_blank" rel="noopener noreferrer">📲 Compartir resultado en WhatsApp</a>
     </div>
 
     <div class="card-kofi">
-        <a href="https://ko-fi.com/tu_usuario" class="btn-kofi-link" target="_blank">
+        <a href="https://ko-fi.com/tu_usuario" class="btn-kofi-link" target="_blank" rel="noopener noreferrer">
             <strong style="font-size:0.95rem; display:block; margin-bottom:4px;">¿Te he salvado de beber maíz hoy?</strong>
             <span style="color: var(--text-muted);">Invítame a una Cerveza de verdad 100% malta para mantener la web libre de marcas industriales.</span>
         </a>
@@ -482,8 +482,56 @@
         }
     }
 
+    /* Guardar en historial local */
+    function guardarEnHistorial(cerveza) {
+        if (!cerveza || !cerveza.ean) return;
+        try {
+            let historial = JSON.parse(localStorage.getItem("pacoli_historial") || "[]");
+            historial = historial.filter(item => item.ean !== cerveza.ean);
+            historial.unshift({ ean: cerveza.ean, marca: cerveza.marca, fecha: new Date().toLocaleDateString() });
+            localStorage.setItem("pacoli_historial", JSON.stringify(historial.slice(0, 10)));
+        } catch (e) {
+            console.warn("No se pudo guardar el historial:", e);
+        }
+    }
+
+    /* Fallback a API de Open Food Facts para EANs no registrados */
+    async function buscarEanRemoto(ean) {
+        try {
+            const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${ean}.json`);
+            const data = await response.json();
+
+            if (data.status === 1 && data.product) {
+                const p = data.product;
+                const ingredientesTexto = p.ingredients_text_es || p.ingredients_text || "No especificados en la etiqueta digital";
+                const tieneAdjuntos = /maíz|maiz|arroz|jarabe|extracto de lúpulo/i.test(ingredientesTexto);
+
+                return {
+                    ean: ean,
+                    marca: p.product_name || "Cerveza Desconocida",
+                    imagen: p.image_url || "",
+                    grupo: p.brands || "No especificado",
+                    fabricante_real: p.manufacturer || p.brands || "No especificado",
+                    origen: p.origins || "No especificado",
+                    puntuacion: tieneAdjuntos ? 45 : 90,
+                    ley_pureza_cumple: !tieneAdjuntos,
+                    adjuntos_detalle: tieneAdjuntos ? "Adjuntos detectados en etiqueta" : "Ninguno",
+                    ingredientes: [ingredientesTexto],
+                    veredicto: tieneAdjuntos 
+                        ? "Contiene adjuntos o extractos detectados en los ingredientes de Open Food Facts."
+                        : "No se detectaron adjuntos en la lista de ingredientes de Open Food Facts."
+                };
+            }
+        } catch (err) {
+            console.error("Error al consultar Open Food Facts:", err);
+        }
+        return null;
+    }
+
     /* Renderizado de Resultados y Cambio Dinámico de Fondo */
     function renderizarResultado(c) {
+        guardarEnHistorial(c);
+
         if (c.imagen) {
             document.body.style.backgroundImage = `linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('${c.imagen}')`;
         }
@@ -495,8 +543,8 @@
         document.getElementById("r-grupo").innerText = c.grupo;
         document.getElementById("r-fabricante").innerText = c.fabricante_real;
         document.getElementById("r-origen").innerText = c.origen;
-        document.getElementById("r-puntuacion").innerText = `${c.puntuacion}/100`;
-        document.getElementById("r-ingredientes").innerText = c.ingredientes.join(", ");
+        document.getElementById("r-puntuacion").innerText = typeof c.puntuacion === "number" ? `${c.puntuacion}/100` : c.puntuacion;
+        document.getElementById("r-ingredientes").innerText = Array.isArray(c.ingredientes) ? c.ingredientes.join(", ") : c.ingredientes;
         document.getElementById("r-veredicto").innerText = c.veredicto;
 
         if (c.ley_pureza_cumple) {
@@ -525,14 +573,32 @@
 
     function buscarManual() {
         const query = document.getElementById("buscador").value.toLowerCase().trim();
+        const card = document.getElementById("resultado");
+
         if (query.length < 3) {
-            document.getElementById("resultado").style.display = "none";
+            card.style.display = "none";
             return;
         }
+
         const encontrada = baseDatosCervezas.find(c => 
             c.ean.includes(query) || c.marca.toLowerCase().includes(query)
         );
-        if (encontrada) renderizarResultado(encontrada);
+
+        if (encontrada) {
+            renderizarResultado(encontrada);
+        } else {
+            document.getElementById("r-marca").innerText = "Sin resultados";
+            document.getElementById("r-badge").className = "badge-pill badge-danger";
+            document.getElementById("r-badge").innerText = "No encontrada";
+            document.getElementById("r-grupo").innerText = "-";
+            document.getElementById("r-fabricante").innerText = "-";
+            document.getElementById("r-origen").innerText = "-";
+            document.getElementById("r-puntuacion").innerText = "-";
+            document.getElementById("r-ingredientes").innerText = "-";
+            document.getElementById("r-veredicto").innerText = `No se encontró "${query}" en la base de datos local. Escanea el código EAN de la botella.`;
+            document.getElementById("r-cross-sell").style.display = "none";
+            card.style.display = "block";
+        }
     }
 
     /* Escáner de Cámara */
@@ -557,13 +623,17 @@
         html5QrCode.start(
             { facingMode: currentFacingMode },
             config,
-            (decodedText) => {
-                const encontrada = baseDatosCervezas.find(c => c.ean === decodedText);
+            async (decodedText) => {
+                let encontrada = baseDatosCervezas.find(c => c.ean === decodedText);
+                if (!encontrada) {
+                    encontrada = await buscarEanRemoto(decodedText);
+                }
+
                 if (encontrada) {
                     renderizarResultado(encontrada);
                     detenerCamara();
                 } else {
-                    alert(`Código EAN ${decodedText} leído, pero no figura en la base de datos.`);
+                    alert(`Código EAN ${decodedText} leído, pero no figura en la base de datos local ni en Open Food Facts.`);
                 }
             },
             () => {}
@@ -581,16 +651,25 @@
         const btnSwitch = document.getElementById("btn-switch-cam");
 
         if (html5QrCode && html5QrCode.isScanning) {
-            await html5QrCode.stop();
-            btnToggle.innerText = "📷 Activar Escáner con Cámara";
-            btnSwitch.style.display = "none";
+            try {
+                await html5QrCode.stop();
+            } catch (e) {
+                console.warn("Error al detener la cámara:", e);
+            } finally {
+                btnToggle.innerText = "📷 Activar Escáner con Cámara";
+                btnSwitch.style.display = "none";
+            }
         }
     }
 
     async function cambiarCamara() {
         if (html5QrCode && html5QrCode.isScanning) {
             currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
-            await html5QrCode.stop();
+            try {
+                await html5QrCode.stop();
+            } catch (e) {
+                console.warn("Error al detener la cámara antes de cambiar:", e);
+            }
             iniciarEscaneo();
         }
     }
