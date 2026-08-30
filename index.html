@@ -23,12 +23,12 @@
 </head>
 <body id="appBody" class="dynamic-bg bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 text-zinc-100 min-h-screen font-sans flex flex-col justify-between selection:bg-amber-500 selection:text-zinc-950">
 
-    <!-- AUDIO ELEMENT PARA CANCION.MP3 -->
+    <!-- AUDIO DE FONDO AUTOMÁTICO -->
     <audio id="bgMusic" src="cancion.mp3" loop preload="auto"></audio>
 
     <div class="max-w-md mx-auto w-full flex-1 flex flex-col p-4 space-y-4">
         
-        <!-- HEADER / NAvegación -->
+        <!-- HEADER / NAVEGACIÓN -->
         <header class="glass-panel p-3.5 rounded-2xl flex items-center justify-between shadow-lg">
             <div class="flex items-center space-x-3">
                 <div class="bg-amber-500/10 p-2 rounded-xl border border-amber-500/20 text-amber-500">
@@ -167,35 +167,14 @@
             <button onclick="switchTab('main')" class="w-full py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold rounded-xl text-zinc-300">Volver</button>
         </main>
 
-        <!-- REPRODUCTOR DE MÚSICA INFERIOR -->
-        <footer class="glass-panel p-3 rounded-2xl flex items-center justify-between text-xs text-zinc-400">
-            <div class="flex items-center space-x-2.5">
-                <div class="w-8 h-8 bg-amber-500/10 text-amber-500 rounded-lg flex items-center justify-center border border-amber-500/20">
-                    <i data-lucide="disc" class="w-4 h-4 animate-spin-slow"></i>
-                </div>
-                <div>
-                    <p class="font-bold text-zinc-200 text-[11px]">Mi Canción Personalizada</p>
-                    <p class="text-[9px] text-zinc-500">cancion.mp3</p>
-                </div>
-            </div>
-            <div class="flex items-center space-x-1">
-                <button onclick="toggleMusic()" class="p-2 text-zinc-300 hover:text-amber-400 transition rounded-lg hover:bg-zinc-800/50">
-                    <i data-lucide="play" id="musicPlayIcon" class="w-4 h-4"></i>
-                </button>
-                <button onclick="toggleMusic()" class="p-2 text-zinc-400 hover:text-zinc-200 transition rounded-lg hover:bg-zinc-800/50">
-                    <i data-lucide="skip-forward" class="w-4 h-4"></i>
-                </button>
-            </div>
-        </footer>
-
-        <!-- CRÉDITOS Y PIE -->
-        <div class="text-center text-[10px] text-zinc-600 space-y-1 pb-2">
+        <!-- CRÉDITOS Y PIE DE PÁGINA -->
+        <footer class="text-center text-[10px] text-zinc-600 space-y-1 py-2">
             <p class="flex items-center justify-center space-x-1">
                 <span>🍺</span>
                 <span class="hover:text-zinc-400 cursor-pointer">Apoyar Proyecto</span>
             </p>
             <p>PacoliScanner PRO © 2026 • Auditoría algorítmica de ingredientes conforme a la Ley de 1516.</p>
-        </div>
+        </footer>
 
     </div>
 
@@ -263,12 +242,23 @@
         lucide.createIcons();
 
         // -------------------------------------------------------------
-        // 1. REPRODUCTOR DE MÚSICA Y EFECTOS DE SONIDO (AudioContext)
+        // 1. REPRODUCTOR DE MÚSICA DE FONDO Y EFECTOS DE SONIDO
         // -------------------------------------------------------------
         let audioCtx = null;
         let isMuted = false;
-        let isMusicPlaying = false;
+        let bgMusicStarted = false;
         const bgMusic = document.getElementById('bgMusic');
+
+        // Inicia música de fondo automáticamente en el primer clic/pantalla que toca el usuario
+        function startBgMusicOnUserInteraction() {
+            if (!bgMusicStarted && bgMusic) {
+                bgMusic.play().then(() => {
+                    bgMusicStarted = true;
+                }).catch(() => {});
+            }
+        }
+        document.addEventListener('click', startBgMusicOnUserInteraction, { once: true });
+        document.addEventListener('touchstart', startBgMusicOnUserInteraction, { once: true });
 
         function initAudio() {
             if (!audioCtx) {
@@ -277,25 +267,6 @@
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
-        }
-
-        function toggleMusic() {
-            initAudio();
-            const musicBtn = document.getElementById('musicPlayIcon');
-            
-            if (isMusicPlaying) {
-                bgMusic.pause();
-                isMusicPlaying = false;
-                if (musicBtn) musicBtn.setAttribute('data-lucide', 'play');
-            } else {
-                bgMusic.play().then(() => {
-                    isMusicPlaying = true;
-                    if (musicBtn) musicBtn.setAttribute('data-lucide', 'pause');
-                }).catch(err => {
-                    console.error("Error al reproducir cancion.mp3:", err);
-                });
-            }
-            lucide.createIcons();
         }
 
         function playSound(type) {
@@ -312,23 +283,23 @@
 
             if (type === 'pure') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, now); // C5
-                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.15); // E5
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.15);
                 gain.gain.setValueAtTime(0.15, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                 osc.start(now);
                 osc.stop(now + 0.3);
             } else if (type === 'impure') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(220, now); // A3
-                osc.frequency.exponentialRampToValueAtTime(164.81, now + 0.2); // E3
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(164.81, now + 0.2);
                 gain.gain.setValueAtTime(0.15, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
                 osc.start(now);
                 osc.stop(now + 0.35);
             } else if (type === 'scan') {
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(880, now); // A5
+                osc.frequency.setValueAtTime(880, now);
                 gain.gain.setValueAtTime(0.1, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
                 osc.start(now);
@@ -338,6 +309,9 @@
 
         function toggleMuteSound() {
             isMuted = !isMuted;
+            if (bgMusic) {
+                bgMusic.muted = isMuted;
+            }
             const btn = document.getElementById("soundToggleBtn");
             btn.innerHTML = isMuted 
                 ? `<i data-lucide="volume-x" class="w-5 h-5 text-rose-400"></i>` 
@@ -414,7 +388,7 @@
                 purity: "100% Pura (Ley de Pureza 1516)",
                 status: "cumple",
                 ingredients: ["Agua", "Malta de Trigo", "Malta de Cebada", "Levadura", "Lúpulo"],
-                details: "Cerveza de trigo tradicional bávara. Elaborada estrictamente conforme a la ordenanza histórica de pureza.",
+                details: "Cerveza de trigo tradicional bávara. Elaborada strictly conforme a la ordenanza histórica de pureza.",
                 score: "9.6/10",
                 color: "from-emerald-950/40 via-zinc-950 to-zinc-950"
             },
