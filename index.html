@@ -48,10 +48,10 @@
             margin: 0 auto;
         }
 
-        /* Top Header - Native App Style */
+        /* Top Header */
         .app-header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .app-header h1 {
@@ -77,7 +77,7 @@
             letter-spacing: -0.2px;
         }
 
-        /* iOS Floating Audio Capsule */
+        /* Mini reproductor flotante estilo iOS */
         .audio-capsule {
             display: flex;
             justify-content: center;
@@ -96,6 +96,9 @@
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .btn-audio.active {
@@ -104,7 +107,7 @@
             box-shadow: 0 0 16px var(--gold-glow);
         }
 
-        /* Rustic Glassmorphic Cards */
+        /* Tarjetas */
         .app-card {
             background: var(--card-bg);
             backdrop-filter: blur(20px);
@@ -116,7 +119,7 @@
             margin-bottom: 20px;
         }
 
-        /* Buttons */
+        /* Botones principales */
         .btn {
             width: 100%;
             border: none;
@@ -153,7 +156,6 @@
             margin-top: 10px;
         }
 
-        /* Native Search Input */
         .input-search {
             width: 100%;
             padding: 14px 16px;
@@ -171,7 +173,6 @@
             box-shadow: 0 0 0 3px var(--gold-glow);
         }
 
-        /* Scanner Viewport */
         #reader {
             width: 100%;
             border-radius: var(--radius-btn);
@@ -181,7 +182,6 @@
             border: 1px solid var(--card-border);
         }
 
-        /* Result View */
         .result-card {
             display: none;
             animation: iosSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1);
@@ -224,7 +224,6 @@
             letter-spacing: -0.5px;
         }
 
-        /* Rustic Grid Table */
         .meta-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -251,7 +250,6 @@
             font-size: 0.92rem;
         }
 
-        /* Detail Boxes */
         .info-box {
             background: rgba(255, 255, 255, 0.03);
             padding: 14px;
@@ -261,10 +259,6 @@
             font-size: 0.88rem;
             line-height: 1.5;
             color: #d6d3d1;
-        }
-
-        .info-box strong {
-            color: var(--text-main);
         }
 
         .cross-sell {
@@ -288,7 +282,6 @@
             margin-top: 10px;
         }
 
-        /* Ko-Fi iOS Card Footer */
         .card-kofi {
             text-align: center;
             background: rgba(24, 20, 16, 0.6);
@@ -317,15 +310,16 @@
     </div>
 
     <div class="audio-capsule">
-        <button id="btn-audio" class="btn-audio" onclick="toggleMusica()">🎵 Música: OFF</button>
+        <button id="btn-audio" class="btn-audio" onclick="toggleManualMusica()">🎵 Música: OFF</button>
     </div>
-    <!-- Etiqueta Audio cargando tu MP3 -->
+
     <audio id="bg-music" loop preload="auto">
         <source src="PacoliPuteroPutero.mp3" type="audio/mpeg">
+        <source src="musica.mp3" type="audio/mpeg">
     </audio>
 
     <div class="app-card">
-        <button id="btn-toggle-cam" class="btn btn-camera" onclick="toggleCamera()">📷 Activar Escáner</button>
+        <button id="btn-toggle-cam" class="btn btn-camera" onclick="toggleCamera()">📷 Activar Escáner con Cámara</button>
         <button id="btn-switch-cam" class="btn btn-secondary" style="display:none;" onclick="cambiarCamara()">🔄 Cambiar Cámara</button>
         <div id="reader"></div>
         <input type="text" id="buscador" class="input-search" placeholder="Escribe marca o escanea EAN-13..." oninput="buscarManual()">
@@ -362,7 +356,7 @@
     <div class="card-kofi">
         <a href="https://ko-fi.com/tu_usuario" class="btn-kofi-link" target="_blank">
             <strong style="font-size:0.95rem; display:block; margin-bottom:4px;">¿Te he salvado de beber maíz hoy?</strong>
-            <span style="color: var(--text-muted);">Invítame a una cerveza 100% malta para mantener PacoliScanner libre de marcas industriales.</span>
+            <span style="color: var(--text-muted);">Invítame a una PacoliScanner 100% malta para mantener la web libre de marcas industriales.</span>
         </a>
     </div>
 </div>
@@ -374,6 +368,7 @@
         {
             ean: "8411090101331",
             marca: "Cruzcampo Pilsen",
+            imagen: "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=1200&q=80",
             grupo: "Heineken España S.A.",
             fabricante_real: "Heineken España S.A.",
             origen: "Sevilla, España",
@@ -386,6 +381,7 @@
         {
             ean: "8410560000010",
             marca: "Voll-Damm",
+            imagen: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=1200&q=80",
             grupo: "Grupo Damm",
             fabricante_real: "Sociedad Anónima Damm",
             origen: "Barcelona, España",
@@ -398,6 +394,7 @@
         {
             ean: "8410014000010",
             marca: "Mahou Cinco Estrellas",
+            imagen: "https://images.unsplash.com/photo-1567696911980-2eed69a46042?auto=format&fit=crop&w=1200&q=80",
             grupo: "Mahou-San Miguel",
             fabricante_real: "Mahou S.A.",
             origen: "Madrid, España",
@@ -410,6 +407,7 @@
         {
             ean: "8410820000010",
             marca: "Estrella Galicia Especial",
+            imagen: "https://images.unsplash.com/photo-1618183479302-1e0aa382c36b?auto=format&fit=crop&w=1200&q=80",
             grupo: "Hijos de Rivera S.A.",
             fabricante_real: "Hijos de Rivera S.A.",
             origen: "A Coruña, España",
@@ -422,6 +420,7 @@
         {
             ean: "8410014001925",
             marca: "Alhambra Reserva 1925",
+            imagen: "https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?auto=format&fit=crop&w=1200&q=80",
             grupo: "Mahou-San Miguel",
             fabricante_real: "Cervezas Alhambra S.L.",
             origen: "Granada, España",
@@ -434,6 +433,7 @@
         {
             ean: "8714100000010",
             marca: "Heineken",
+            imagen: "https://images.unsplash.com/photo-1618886614638-80e3c103d31a?auto=format&fit=crop&w=1200&q=80",
             grupo: "Heineken N.V.",
             fabricante_real: "Heineken España / N.V.",
             origen: "Países Bajos / España",
@@ -447,8 +447,47 @@
 
     let html5QrCode = null;
     let currentFacingMode = "environment";
+    const audio = document.getElementById("bg-music");
+    const btnAudio = document.getElementById("btn-audio");
 
+    /* Lógica para Autoplay */
+    function intentarReproducirMúsica() {
+        if (audio.paused) {
+            audio.play().then(() => {
+                btnAudio.innerText = "🔊 Música: ON";
+                btnAudio.classList.add("active");
+                document.removeEventListener("click", intentarReproducirMúsica);
+                document.removeEventListener("touchstart", intentarReproducirMúsica);
+            }).catch(() => {});
+        }
+    }
+
+    window.addEventListener("load", () => {
+        intentarReproducirMúsica();
+    });
+
+    document.addEventListener("click", intentarReproducirMúsica);
+    document.addEventListener("touchstart", intentarReproducirMúsica);
+
+    function toggleManualMusica() {
+        if (audio.paused) {
+            audio.play().then(() => {
+                btnAudio.innerText = "🔊 Música: ON";
+                btnAudio.classList.add("active");
+            });
+        } else {
+            audio.pause();
+            btnAudio.innerText = "🎵 Música: OFF";
+            btnAudio.classList.remove("active");
+        }
+    }
+
+    /* Renderizado de Resultados y Cambio Dinámico de Fondo */
     function renderizarResultado(c) {
+        if (c.imagen) {
+            document.body.style.backgroundImage = `linear-gradient(var(--bg-overlay), var(--bg-overlay)), url('${c.imagen}')`;
+        }
+
         const card = document.getElementById("resultado");
         const badge = document.getElementById("r-badge");
         
@@ -496,6 +535,7 @@
         if (encontrada) renderizarResultado(encontrada);
     }
 
+    /* Escáner de Cámara */
     async function toggleCamera() {
         if (html5QrCode && html5QrCode.isScanning) {
             await detenerCamara();
@@ -542,7 +582,7 @@
 
         if (html5QrCode && html5QrCode.isScanning) {
             await html5QrCode.stop();
-            btnToggle.innerText = "📷 Activar Escáner";
+            btnToggle.innerText = "📷 Activar Escáner con Cámara";
             btnSwitch.style.display = "none";
         }
     }
@@ -552,24 +592,6 @@
             currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
             await html5QrCode.stop();
             iniciarEscaneo();
-        }
-    }
-
-    function toggleMusica() {
-        const audio = document.getElementById("bg-music");
-        const btn = document.getElementById("btn-audio");
-
-        if (audio.paused) {
-            audio.play().then(() => {
-                btn.innerText = "🔊 Música: ON";
-                btn.classList.add("active");
-            }).catch(() => {
-                alert("Asegúrate de incluir 'musica.mp3' en la raíz de la web.");
-            });
-        } else {
-            audio.pause();
-            btn.innerText = "🎵 Música: OFF";
-            btn.classList.remove("active");
         }
     }
 </script>
