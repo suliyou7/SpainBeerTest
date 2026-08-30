@@ -76,11 +76,11 @@
         /* ========================================================================= */
     </style>
 </head>
-<body class="app-gradient text-slate-100 h-screen w-full overflow-hidden flex flex-col font-sans selection:bg-amber-500 selection:text-slate-900">
+<body class="app-gradient text-slate-100 min-h-screen w-full flex flex-col font-sans selection:bg-amber-500 selection:text-slate-900">
 
     <audio id="bgMusic" src="cancion.mp3" loop preload="auto"></audio>
 
-    <header class="px-5 pt-6 pb-4 flex items-center justify-between z-10">
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-white/5 px-5 pt-6 pb-4 flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <div class="bg-amber-500 rounded-xl p-2 shadow-lg shadow-amber-500/20">
                 <i data-lucide="beer" class="w-6 h-6 text-slate-900"></i>
@@ -98,7 +98,7 @@
         </button>
     </header>
 
-    <main class="flex-1 overflow-y-auto no-scrollbar px-5 pb-28 relative">
+    <main class="no-scrollbar px-5 pb-32 relative">
         
         <section id="tab-home" class="fade-in space-y-6">
             
