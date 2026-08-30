@@ -306,7 +306,7 @@
 <div class="app-container">
     <div class="app-header">
         <h1>🍺 PacoliScanner</h1>
-        <p>Escanea el código de barra de tu "latita" para analizar su nivel de "pureza"</p>
+        <p>El escáner independiente de pureza cervecera</p>
     </div>
 
     <div class="audio-capsule">
@@ -322,7 +322,7 @@
         <button id="btn-toggle-cam" class="btn btn-camera" onclick="toggleCamera()">📷 Activar Escáner con Cámara</button>
         <button id="btn-switch-cam" class="btn btn-secondary" style="display:none;" onclick="cambiarCamara()">🔄 Cambiar Cámara</button>
         <div id="reader"></div>
-        <input type="text" id="buscador" class="input-search" placeholder="Escribe marca o escanea EAN-13..." oninput="buscarManual()">
+        <input type="text" id="buscador" class="input-search" placeholder="Escribe marca, variante o escanea EAN-13..." oninput="buscarManual()">
     </div>
 
     <div id="resultado" class="app-card result-card">
@@ -365,6 +365,7 @@
     const TAG_AFILIADO = "tu_tag_afiliado-21";
 
     const baseDatosCervezas = [
+        /* --- GRUPO HEINEKEN ESPAÑA / CRUZCAMPO --- */
         {
             ean: "8411090101331",
             marca: "Cruzcampo Pilsen",
@@ -379,18 +380,72 @@
             veredicto: "Contiene maíz para abaratar costes. El uso de extracto de lúpulo aporta un amargor industrial más seco."
         },
         {
-            ean: "8410560000010",
-            marca: "Voll-Damm",
+            ean: "8411090008005",
+            marca: "Cruzcampo Cruz del Sur",
             imagen: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=1200&q=80",
-            grupo: "Grupo Damm",
-            fabricante_real: "Sociedad Anónima Damm",
-            origen: "Barcelona, España",
-            puntuacion: 95,
+            grupo: "Heineken España S.A.",
+            fabricante_real: "Heineken España S.A.",
+            origen: "Sevilla / Jaén, España",
+            puntuacion: 80,
             ley_pureza_cumple: true,
             adjuntos_detalle: "Ninguno",
             ingredientes: ["Agua", "100% Malta de cebada", "Lúpulo", "Levadura"],
-            veredicto: "Cumple la Ley de Pureza Alemana. Doble malta genuina con gran cuerpo, retención de espuma y amargor noble."
+            veredicto: "Variante especial de Cruzcampo elaborada tradicionalmente para el sur peninsular. Prescinde del maíz y utiliza 100% malta de cebada."
         },
+        {
+            ean: "8411090000306",
+            marca: "Cruzcampo Gran Reserva",
+            imagen: "https://images.unsplash.com/photo-1567696911980-2eed69a46042?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Heineken España S.A.",
+            fabricante_real: "Heineken España S.A.",
+            origen: "Sevilla, España",
+            puntuacion: 92,
+            ley_pureza_cumple: true,
+            adjuntos_detalle: "Ninguno",
+            ingredientes: ["Agua", "100% Malta de cebada", "Lúpulo seleccionado", "Levadura"],
+            veredicto: "Cerveza tostada de maduración reposada. Cumple estrictamente la Ley de Pureza con 100% malta y gran cuerpo."
+        },
+        {
+            ean: "8411090010206",
+            marca: "Cruzcampo Tremenda",
+            imagen: "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Heineken España S.A.",
+            fabricante_real: "Heineken España S.A.",
+            origen: "Sevilla, España",
+            puntuacion: 42,
+            ley_pureza_cumple: false,
+            adjuntos_detalle: "Maíz",
+            ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo", "Aromas naturales"],
+            veredicto: "Variante con la mitad de alcohol (2.4% ABV). Utiliza maíz en su receta para mantener el cuerpo aligerado."
+        },
+        {
+            ean: "8411090000207",
+            marca: "Amstel Original",
+            imagen: "https://images.unsplash.com/photo-1618886614638-80e3c103d31a?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Heineken España S.A.",
+            fabricante_real: "Heineken España S.A.",
+            origen: "Madrid / Valencia, España",
+            puntuacion: 85,
+            ley_pureza_cumple: true,
+            adjuntos_detalle: "Ninguno",
+            ingredientes: ["Agua", "100% Malta de cebada", "Lúpulo", "Levadura"],
+            veredicto: "Fórmula elaborada en España bajo la receta 100% malta. Sin maíz ni arroz en sus componentes."
+        },
+        {
+            ean: "8714100000010",
+            marca: "Heineken Original",
+            imagen: "https://images.unsplash.com/photo-1618886614638-80e3c103d31a?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Heineken N.V.",
+            fabricante_real: "Heineken España / N.V.",
+            origen: "Países Bajos / España",
+            puntuacion: 85,
+            ley_pureza_cumple: true,
+            adjuntos_detalle: "Ninguno",
+            ingredientes: ["Agua", "100% Malta de cebada", "Lúpulo", "Levadura A-Yeast"],
+            veredicto: "Cumple la Ley de Pureza de 1516. 100% malta con fermentación en tanques horizontales."
+        },
+
+        /* --- GRUPO MAHOU-SAN MIGUEL --- */
         {
             ean: "8410014000010",
             marca: "Mahou Cinco Estrellas",
@@ -405,17 +460,30 @@
             veredicto: "Añade maíz para aligerar el cuerpo. Mantiene un sabor seco característico, pero suspende la Ley de Pureza."
         },
         {
-            ean: "8410820000010",
-            marca: "Estrella Galicia Especial",
-            imagen: "https://images.unsplash.com/photo-1618183479302-1e0aa382c36b?auto=format&fit=crop&w=1200&q=80",
-            grupo: "Hijos de Rivera S.A.",
-            fabricante_real: "Hijos de Rivera S.A.",
-            origen: "A Coruña, España",
-            puntuacion: 65,
+            ean: "8410014000027",
+            marca: "Mahou Clásica",
+            imagen: "https://images.unsplash.com/photo-1567696911980-2eed69a46042?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Mahou-San Miguel",
+            fabricante_real: "Mahou S.A.",
+            origen: "Madrid, España",
+            puntuacion: 45,
             ley_pureza_cumple: false,
             adjuntos_detalle: "Maíz",
             ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo", "Levadura"],
-            veredicto: "Lleva maíz en su receta base, aunque su maduración más lenta logra disimular el adjunto con un sabor muy equilibrado."
+            veredicto: "La etiqueta verde tradicional. Incorpora maíz para suavizar la densidad del trago."
+        },
+        {
+            ean: "8410014003509",
+            marca: "Mahou Maestra Doble Lúpulo",
+            imagen: "https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Mahou-San Miguel",
+            fabricante_real: "Mahou S.A.",
+            origen: "Madrid, España",
+            puntuacion: 90,
+            ley_pureza_cumple: true,
+            adjuntos_detalle: "Ninguno",
+            ingredientes: ["Agua", "100% Malta de cebada", "Lúpulos tostados", "Levadura"],
+            veredicto: "Gama premium de Mahou. Elaborada con 100% malta y dobles tiempos de lupulado."
         },
         {
             ean: "8410014001925",
@@ -427,21 +495,118 @@
             puntuacion: 70,
             ley_pureza_cumple: false,
             adjuntos_detalle: "Maíz",
-            ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo", "Levadura"],
-            veredicto: "Utiliza maíz para equilibrar el grado alcohólico, pero ofrece cuerpo y perfil aromático destacables."
+            ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo Saaz", "Levadura"],
+            veredicto: "Utiliza maíz para equilibrar el grado alcohólico, pero ofrece un perfil aromático y cuerpo muy equilibrados."
         },
         {
-            ean: "8714100000010",
-            marca: "Heineken",
-            imagen: "https://images.unsplash.com/photo-1618886614638-80e3c103d31a?auto=format&fit=crop&w=1200&q=80",
-            grupo: "Heineken N.V.",
-            fabricante_real: "Heineken España / N.V.",
-            origen: "Países Bajos / España",
-            puntuacion: 85,
+            ean: "8410014001901",
+            marca: "Alhambra Especial",
+            imagen: "https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Mahou-San Miguel",
+            fabricante_real: "Cervezas Alhambra S.L.",
+            origen: "Granada, España",
+            puntuacion: 50,
+            ley_pureza_cumple: false,
+            adjuntos_detalle: "Maíz",
+            ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo", "Levadura"],
+            veredicto: "Lager dorada de fermentación lenta que incluye maíz en su composición base."
+        },
+        {
+            ean: "8410014000089",
+            marca: "San Miguel Especial",
+            imagen: "https://images.unsplash.com/photo-1618183479302-1e0aa382c36b?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Mahou-San Miguel",
+            fabricante_real: "Cervezas San Miguel S.A.",
+            origen: "Lleida / Málaga, España",
+            puntuacion: 45,
+            ley_pureza_cumple: false,
+            adjuntos_detalle: "Maíz",
+            ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo", "Levadura"],
+            veredicto: "Cerveza tipo pilsen internacional elaborada en España con maíz como adjunto cervecero."
+        },
+
+        /* --- GRUPO HIJOS DE RIVERA (ESTRELLA GALICIA / 1906) --- */
+        {
+            ean: "8410820000010",
+            marca: "Estrella Galicia Especial",
+            imagen: "https://images.unsplash.com/photo-1618183479302-1e0aa382c36b?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Hijos de Rivera S.A.",
+            fabricante_real: "Hijos de Rivera S.A.",
+            origen: "A Coruña, España",
+            puntuacion: 65,
+            ley_pureza_cumple: false,
+            adjuntos_detalle: "Maíz",
+            ingredientes: ["Agua", "Malta de cebada", "Maíz", "Lúpulo Perle", "Levadura"],
+            veredicto: "Lleva maíz en su receta base, aunque su maduración más lenta logra disimular el adjunto con un sabor muy equilibrado."
+        },
+        {
+            ean: "8410820002120",
+            marca: "1906 Reserva Especial",
+            imagen: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Hijos de Rivera S.A.",
+            fabricante_real: "Hijos de Rivera S.A.",
+            origen: "A Coruña, España",
+            puntuacion: 95,
             ley_pureza_cumple: true,
             adjuntos_detalle: "Ninguno",
-            ingredientes: ["Agua", "100% Malta de cebada", "Lúpulo", "Levadura A-Yeast"],
-            veredicto: "Cumple la Ley de Pureza de 1516. 100% malta con fermentación en tanques horizontales."
+            ingredientes: ["Agua", "100% Malta de cebada (Pilsen y Tostada)", "Lúpulo Perle", "Levadura"],
+            veredicto: "La joya de la corona del grupo. Elaborada exclusivamente con maltas tostadas y lúpulo noble, sin ningún tipo de adjunto."
+        },
+        {
+            ean: "8410820002151",
+            marca: "1906 Red Vintage (La Pelirroja)",
+            imagen: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Hijos de Rivera S.A.",
+            fabricante_real: "Hijos de Rivera S.A.",
+            origen: "A Coruña, España",
+            puntuacion: 92,
+            ley_pureza_cumple: true,
+            adjuntos_detalle: "Ninguno",
+            ingredientes: ["Agua", "100% Malta de cebada", "Lúpulo", "Levadura"],
+            veredicto: "Receta tradicional recuperada. Intensa, con 8% de alcohol conseguido íntegramente mediante malta pura."
+        },
+
+        /* --- GRUPO DAMM --- */
+        {
+            ean: "8410560000010",
+            marca: "Voll-Damm Doble Malta",
+            imagen: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Grupo Damm",
+            fabricante_real: "Sociedad Anónima Damm",
+            origen: "Barcelona, España",
+            puntuacion: 95,
+            ley_pureza_cumple: true,
+            adjuntos_detalle: "Ninguno",
+            ingredientes: ["Agua", "100% Malta de cebada", "Lúpulo", "Levadura"],
+            veredicto: "Cumple la Ley de Pureza Alemana. Doble malta genuina con gran cuerpo, retención de espuma y amargor noble."
+        },
+        {
+            ean: "8410560000140",
+            marca: "Estrella Damm",
+            imagen: "https://images.unsplash.com/photo-1608270586620-248524c67de9?auto=format&fit=crop&w=1200&q=80",
+            grupo: "Grupo Damm",
+            fabricante_real: "Sociedad Anónima Damm",
+            origen: "Barcelona, España",
+            puntuacion: 60,
+            ley_pureza_cumple: false,
+            adjuntos_detalle: "Arroz",
+            ingredientes: ["Agua", "Malta de cebada", "Arroz mediterráneo", "Lúpulo", "Levadura"],
+            veredicto: "Lleva arroz mediterráneo según su receta tradicional desde 1876. Al no usar 100% cebada/trigo, no cumple la Ley de Pureza estricta."
+        },
+
+        /* --- LA ZARAGOZANA (AMBAR) --- */
+        {
+            ean: "8410182000010",
+            marca: "Ambar Especial",
+            imagen: "https://images.unsplash.com/photo-1567696911980-2eed69a46042?auto=format&fit=crop&w=1200&q=80",
+            grupo: "La Zaragozana S.A.",
+            fabricante_real: "La Zaragozana S.A.",
+            origen: "Zaragoza, España",
+            puntuacion: 90,
+            ley_pureza_cumple: true,
+            adjuntos_detalle: "Ninguno",
+            ingredientes: ["Agua", "100% Malta de cebada", "Lúpulo", "Levadura"],
+            veredicto: "Una de las pocas lagers comerciales de gran consumo que mantiene el compromiso de elaboración 100% malta de cebada."
         }
     ];
 
@@ -575,7 +740,7 @@
         const query = document.getElementById("buscador").value.toLowerCase().trim();
         const card = document.getElementById("resultado");
 
-        if (query.length < 3) {
+        if (query.length < 2) {
             card.style.display = "none";
             return;
         }
@@ -595,7 +760,7 @@
             document.getElementById("r-origen").innerText = "-";
             document.getElementById("r-puntuacion").innerText = "-";
             document.getElementById("r-ingredientes").innerText = "-";
-            document.getElementById("r-veredicto").innerText = `No se encontró "${query}" en la base de datos local. Escanea el código EAN de la botella.`;
+            document.getElementById("r-veredicto").innerText = `No se encontró "${query}" en la base de datos local. Prueba escaneando el código EAN.`;
             document.getElementById("r-cross-sell").style.display = "none";
             card.style.display = "block";
         }
