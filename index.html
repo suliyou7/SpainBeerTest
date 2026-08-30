@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PacoliScanner | Escáner de "Pureza Cervecera"</title>
+    <title>CervezaHonesta | Escáner de Pureza Cervecera</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <style>
         :root {
@@ -47,6 +47,24 @@
             color: var(--text-muted);
             font-size: 0.85rem;
             margin-top: 5px;
+        }
+
+        .btn-audio {
+            background: #2f3542;
+            color: var(--text-main);
+            border: 1px solid #57606f;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-audio.active {
+            background: var(--primary-amber);
+            color: #121214;
+            font-weight: bold;
+            border-color: var(--primary-amber);
         }
 
         .search-card {
@@ -180,9 +198,15 @@
 
 <div class="container">
     <div class="header">
-        <h1>🍺 PacoliScanner</h1>
-        <p>El escáner independiente de cerveza con pureza</p>
+        <h1>🍺 CervezaHonesta</h1>
+        <p>El escáner independiente de pureza cervecera</p>
     </div>
+
+    <!-- Control de Música de Fondo -->
+    <div style="text-align: center; margin-bottom: 15px;">
+        <button id="btn-audio" class="btn-audio" onclick="toggleMusica()">🎵 Música: OFF</button>
+    </div>
+    <audio id="bg-music" loop src="musica.mp3"></audio>
 
     <div class="search-card">
         <button class="btn-camera" onclick="toggleCamera()">📷 Activar Escáner con Cámara</button>
@@ -225,7 +249,7 @@
 </div>
 
 <script>
-    const TAG_AFILIADO = "tu_tag_afiliado-21"; // Cambia esto por tu ID de Amazon Afiliados cuando lo tengas
+    const TAG_AFILIADO = "tu_tag_afiliado-21";
 
     const baseDatosCervezas = [
         {
@@ -369,6 +393,24 @@
                 alert(`Código EAN ${decodedText} leído, pero no figura en la base de datos local.`);
             }
         });
+    }
+
+    function toggleMusica() {
+        const audio = document.getElementById("bg-music");
+        const btn = document.getElementById("btn-audio");
+
+        if (audio.paused) {
+            audio.play().then(() => {
+                btn.innerText = "🔊 Música: ON";
+                btn.classList.add("active");
+            }).catch(err => {
+                alert("Asegúrate de subir un archivo de audio llamado musica.mp3 a la raíz del repositorio.");
+            });
+        } else {
+            audio.pause();
+            btn.innerText = "🎵 Música: OFF";
+            btn.classList.remove("active");
+        }
     }
 </script>
 </body>
