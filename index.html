@@ -319,7 +319,10 @@
     <div class="audio-capsule">
         <button id="btn-audio" class="btn-audio" onclick="toggleMusica()">🎵 Música: OFF</button>
     </div>
-    <audio id="bg-music" loop src="musica.mp3"></audio>
+    <!-- Etiqueta Audio cargando tu MP3 -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="PacoliPuteroPutero.mp3" type="audio/mpeg">
+    </audio>
 
     <div class="app-card">
         <button id="btn-toggle-cam" class="btn btn-camera" onclick="toggleCamera()">📷 Activar Escáner</button>
