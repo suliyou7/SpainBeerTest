@@ -50,7 +50,7 @@
         </div>
     </header>
 
-    <!-- REPRODUCTOR DE MÚSICA DE FONDO (OPCIONAL) -->
+    <!-- REPRODUCTOR DE MÚSICA DE FONDO -->
     <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3"></audio>
 
     <!-- NAVEGACIÓN PRINCIPAL / VISTAS -->
@@ -233,13 +233,25 @@
     </div>
 
     <!-- FOOTER Y CRÉDITOS -->
-    <footer class="border-t border-zinc-900 bg-zinc-950/80 p-4 text-center space-y-2">
-        <div class="flex justify-center items-center space-x-4 text-xs text-zinc-400">
-            <button onclick="toggleAudioBGM()" class="hover:text-amber-400 transition flex items-center space-x-1">
-                <i data-lucide="music-2" class="w-3.5 h-3.5"></i>
-                <span>Música Lo-Fi Ambient</span>
-            </button>
-            <span>•</span>
+    <footer class="border-t border-zinc-900 bg-zinc-950/80 p-4 text-center space-y-3">
+        
+        <!-- REPRODUCTOR COMPACTO DE MÚSICA -->
+        <div class="glass-panel max-w-xs mx-auto p-2.5 rounded-2xl flex items-center justify-between border border-zinc-800/80 text-xs shadow-lg">
+            <div class="flex items-center space-x-2 text-left truncate max-w-[150px]">
+                <i data-lucide="disc" class="w-4 h-4 text-amber-500 animate-spin" style="animation-duration: 4s;"></i>
+                <span id="currentTrackTitle" class="text-[11px] text-zinc-300 font-medium truncate">Música Ambient Lo-Fi</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+                <button onclick="toggleAudioBGM()" id="bgmPlayBtn" title="Reproducir / Pausar" class="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-amber-400 rounded-xl transition flex items-center justify-center">
+                    <i data-lucide="play" class="w-3.5 h-3.5" id="bgmPlayIcon"></i>
+                </button>
+                <button onclick="nextTrack()" title="Siguiente canción" class="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-amber-400 rounded-xl transition flex items-center justify-center">
+                    <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="flex justify-center items-center space-x-4 text-xs text-zinc-400 pt-1">
             <a href="https://buymeacoffee.com" target="_blank" class="hover:text-amber-400 transition flex items-center space-x-1">
                 <span>☕ Apoyar Proyecto</span>
             </a>
@@ -323,13 +335,47 @@
             lucide.createIcons();
         }
 
+        // -------------------------------------------------------------
+        // REPRODUCTOR DE MÚSICA DE FONDO Y LISTA DE REPRODUCCIÓN
+        // -------------------------------------------------------------
+        const playlist = [
+            { title: "Música Ambient Lo-Fi", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" },
+            { title: "Mi Canción Personalizada", src: "cancion.mp3" } // Cambia 'cancion.mp3' por el nombre de tu archivo en GitHub
+        ];
+        let currentTrackIndex = 0;
+
         function toggleAudioBGM() {
             const bgm = document.getElementById("bgMusic");
+            const playIcon = document.getElementById("bgmPlayIcon");
             if (bgm.paused) {
-                bgm.play().catch(() => alert("Interactúa con la pantalla primero para activar el audio."));
+                bgm.play().then(() => {
+                    if (playIcon) playIcon.setAttribute("data-lucide", "pause");
+                    lucide.createIcons();
+                }).catch(() => alert("Interactúa con la pantalla primero para activar el audio."));
             } else {
                 bgm.pause();
+                if (playIcon) playIcon.setAttribute("data-lucide", "play");
+                lucide.createIcons();
             }
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
+            const bgm = document.getElementById("bgMusic");
+            const track = playlist[currentTrackIndex];
+            
+            bgm.src = track.src;
+            document.getElementById("currentTrackTitle").innerText = track.title;
+
+            bgm.play().then(() => {
+                const playIcon = document.getElementById("bgmPlayIcon");
+                if (playIcon) playIcon.setAttribute("data-lucide", "pause");
+                lucide.createIcons();
+            }).catch(() => {
+                const playIcon = document.getElementById("bgmPlayIcon");
+                if (playIcon) playIcon.setAttribute("data-lucide", "play");
+                lucide.createIcons();
+            });
         }
 
         // -------------------------------------------------------------
