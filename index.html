@@ -3,205 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PacoliScanner Pro - Ley de Pureza Cervecera (1516)</title>
-    <!-- Tailwind CSS -->
+    <title>PacoliScanner Pro - Ley de Pureza 1516</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- HTML5 QRCode Scanner -->
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Html5Qrcode para escáner de cámara -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        .dynamic-bg { transition: background 0.7s ease-in-out, color 0.5s ease; }
-        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.4); border-radius: 10px; }
-        .glass-panel { background: rgba(24, 24, 27, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(63, 63, 70, 0.5); }
+        .glass-panel {
+            background: rgba(24, 24, 27, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .dynamic-bg {
+            transition: background 0.5s ease-in-out;
+        }
     </style>
 </head>
-<body id="appBody" class="dynamic-bg bg-zinc-950 text-zinc-100 min-h-screen font-sans flex flex-col justify-between selection:bg-amber-500 selection:text-zinc-950">
+<body id="appBody" class="dynamic-bg bg-gradient-to-b from-zinc-950 via-zinc-900 to-zinc-950 text-zinc-100 min-h-screen font-sans flex flex-col justify-between selection:bg-amber-500 selection:text-zinc-950">
 
-    <!-- BARRA SUPERIOR / HEADER -->
-    <header class="bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800/80 p-3.5 sticky top-0 z-40 flex justify-between items-center shadow-xl">
-        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('search')">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500/20 to-amber-700/10 border border-amber-500/40 flex items-center justify-center text-xl shadow-inner">
-                🍺
+    <!-- AUDIO ELEMENT PARA CANCION.MP3 -->
+    <audio id="bgMusic" src="cancion.mp3" loop preload="auto"></audio>
+
+    <div class="max-w-md mx-auto w-full flex-1 flex flex-col p-4 space-y-4">
+        
+        <!-- HEADER / NAvegación -->
+        <header class="glass-panel p-3.5 rounded-2xl flex items-center justify-between shadow-lg">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500/10 p-2 rounded-xl border border-amber-500/20 text-amber-500">
+                    <i data-lucide="beer" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="font-black text-base tracking-wide text-amber-500 flex items-center space-x-1.5">
+                        <span>PACOLISCANNER</span>
+                        <span class="text-[9px] bg-amber-500 text-zinc-950 font-bold px-1.5 py-0.5 rounded">PRO</span>
+                    </h1>
+                    <p class="text-[10px] text-zinc-400 font-medium">Reinheitsgebot 1516 Engine</p>
+                </div>
             </div>
-            <div>
-                <h1 class="font-black text-sm tracking-wider text-amber-500 leading-none">PACOLISCANNER <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded border border-amber-500/30 font-bold ml-1">PRO</span></h1>
-                <p class="text-[10px] text-zinc-400 font-medium">Reinheitsgebot 1516 Engine</p>
+            
+            <div class="flex items-center space-x-1.5">
+                <button onclick="switchTab('history')" class="p-2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 rounded-xl transition relative">
+                    <i data-lucide="history" class="w-5 h-5"></i>
+                    <span id="historyBadge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-zinc-950 text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                </button>
+                <button onclick="switchTab('stats')" class="p-2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 rounded-xl transition">
+                    <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+                </button>
+                <button onclick="toggleMuteSound()" id="soundToggleBtn" class="p-2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 rounded-xl transition">
+                    <i data-lucide="volume-2" class="w-5 h-5"></i>
+                </button>
+                <button onclick="openScanner()" class="bg-amber-500 hover:bg-amber-400 text-zinc-950 p-2.5 rounded-xl font-bold transition shadow-md shadow-amber-500/10 flex items-center space-x-1">
+                    <i data-lucide="scan" class="w-5 h-5"></i>
+                    <span class="text-xs hidden sm:inline">Escanear</span>
+                </button>
             </div>
-        </div>
+        </header>
 
-        <!-- Acciones Rápidas del Header -->
-        <div class="flex items-center space-x-1.5">
-            <button onclick="switchTab('history')" title="Historial de escaneos" class="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-amber-400 transition relative">
-                <i data-lucide="history" class="w-4 h-4"></i>
-                <span id="historyBadge" class="hidden absolute -top-1 -right-1 bg-amber-500 text-zinc-950 text-[9px] font-black w-4 h-4 rounded-full flex items-center justify-center">0</span>
-            </button>
-            <button onclick="switchTab('stats')" title="Estadísticas" class="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-amber-400 transition">
-                <i data-lucide="bar-chart-3" class="w-4 h-4"></i>
-            </button>
-            <button id="audioToggleBtn" onclick="toggleMute()" title="Efectos de sonido" class="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-amber-400 transition">
-                <i data-lucide="volume-2" class="w-4 h-4" id="audioIcon"></i>
-            </button>
-            <button onclick="openScanner()" class="bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-zinc-950 font-bold px-3.5 py-2.5 rounded-xl text-xs transition flex items-center space-x-1.5 shadow-lg shadow-amber-950/50">
-                <i data-lucide="scan" class="w-4 h-4"></i>
-                <span class="hidden sm:inline">Escanear</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- REPRODUCTOR DE MÚSICA DE FONDO -->
-    <audio id="bgMusic" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3"></audio>
-
-    <!-- NAVEGACIÓN PRINCIPAL / VISTAS -->
-    <main class="max-w-lg w-full mx-auto p-4 flex-grow flex flex-col justify-center space-y-6">
-
-        <!-- TAB 1: BÚSQUEDA Y EVALUADOR -->
-        <section id="tabSearch" class="space-y-6">
-            <div class="text-center space-y-2">
-                <span class="inline-flex items-center space-x-1 px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-semibold">
-                    <span>📜</span>
-                    <span>Control de Aditivos y Cereales Adjuntos</span>
-                </span>
-                <h2 class="text-2xl font-black text-zinc-100 tracking-tight">Verificador de Pureza</h2>
-                <p class="text-xs text-zinc-400 max-w-xs mx-auto">
-                    Escanea el código EAN o busca en la base de datos para detectar maíz, arroz o azúcares añadidos.
-                </p>
-            </div>
-
-            <!-- Caja de Búsqueda -->
+        <!-- SECCIÓN PRINCIPAL: VERIFICADOR -->
+        <main id="tabMain" class="space-y-4 flex-1">
+            
+            <!-- BUSCADOR -->
             <div class="relative">
-                <div class="relative flex items-center">
-                    <i data-lucide="search" class="w-4 h-4 absolute left-4 text-zinc-400"></i>
-                    <input type="text" id="searchInput" placeholder="Buscar por marca o estilo (Ej: Alhambra, 1906, Paulaner)..." 
-                        class="w-full bg-zinc-900/90 border border-zinc-800 rounded-2xl pl-11 pr-10 py-3.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-amber-500 transition shadow-inner"
-                        oninput="handleSearch(this.value)">
-                    <button onclick="clearSearch()" id="clearBtn" class="absolute right-3 text-zinc-500 hover:text-zinc-300 hidden">
-                        <i data-lucide="x-circle" class="w-4 h-4"></i>
+                <div class="glass-panel rounded-2xl p-2 flex items-center space-x-2 focus-within:border-amber-500/50 transition">
+                    <i data-lucide="search" class="w-5 h-5 text-zinc-400 ml-2"></i>
+                    <input type="text" id="searchInput" oninput="searchBeers()" placeholder="Buscar por marca o estilo (Ej: Alhambra, 1906, Paulaner)..." 
+                           class="w-full bg-transparent border-none text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none py-1.5">
+                    <button onclick="clearSearch()" id="clearBtn" class="hidden p-1 text-zinc-500 hover:text-zinc-300">
+                        <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
 
-                <!-- Desplegable de Sugerencias -->
-                <div id="suggestions" class="absolute left-0 right-0 mt-2 bg-zinc-900/95 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl z-30 hidden max-h-64 overflow-y-auto custom-scrollbar backdrop-blur-md"></div>
+                <!-- SUGERENCIAS DESPLEGABLES -->
+                <div id="suggestions" class="hidden absolute left-0 right-0 top-full mt-2 glass-panel rounded-2xl overflow-hidden z-30 shadow-2xl border border-zinc-800 max-h-64 overflow-y-auto"></div>
             </div>
 
-            <!-- Accesos Rápidos y Creación Manual -->
-            <div class="flex flex-wrap gap-2 justify-center pt-1">
-                <button onclick="quickFilter('puras')" class="px-3 py-1.5 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-xs text-emerald-400 transition flex items-center space-x-1">
+            <!-- BOTONES RÁPIDOS DE CATEGORÍA -->
+            <div class="flex items-center space-x-2 overflow-x-auto pb-1 text-xs">
+                <button onclick="filterCategory('puras')" class="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:border-amber-500/40 hover:text-amber-400 transition flex items-center space-x-1.5 whitespace-nowrap">
                     <span>✅ 100% Puras</span>
                 </button>
-                <button onclick="quickFilter('trigo')" class="px-3 py-1.5 bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 rounded-xl text-xs text-amber-300 transition">
-                    🌾 Alemanas de Trigo
+                <button onclick="filterCategory('trigo')" class="px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:border-amber-500/40 hover:text-amber-400 transition flex items-center space-x-1.5 whitespace-nowrap">
+                    <span>🌾 Alemanas de Trigo</span>
                 </button>
-                <button onclick="openCustomBeerModal()" class="px-3 py-1.5 bg-zinc-900/80 hover:bg-zinc-800 border border-amber-500/30 rounded-xl text-xs text-amber-400 transition flex items-center space-x-1">
-                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+                <button onclick="openCustomBeerModal()" class="px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500/20 transition flex items-center space-x-1.5 whitespace-nowrap">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                     <span>Añadir Cerveza</span>
                 </button>
             </div>
-        </section>
 
-        <!-- TAB 2: FICHA DETALLADA DE PRODUCTO -->
-        <section id="tabResult" class="hidden space-y-4">
-            <button onclick="switchTab('search')" class="inline-flex items-center space-x-1.5 text-xs text-amber-500 hover:text-amber-400 font-semibold transition">
-                <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                <span>Volver a la búsqueda</span>
-            </button>
-
-            <div id="beerCard" class="glass-panel rounded-3xl p-6 space-y-5 shadow-2xl relative overflow-hidden">
-                <!-- Inyección Dinámica de Ficha -->
-            </div>
-        </section>
-
-        <!-- TAB 3: HISTORIAL PERSISTENTE -->
-        <section id="tabHistory" class="hidden space-y-4">
-            <div class="flex justify-between items-center">
-                <div>
-                    <h3 class="text-lg font-bold text-zinc-100">Historial de Escaneos</h3>
-                    <p class="text-xs text-zinc-400">Registrado localmente en tu navegador</p>
+            <!-- TARJETA DE RESULTADO DE CERVEZA -->
+            <div id="beerCardContainer">
+                <div id="beerCard" class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div class="text-center py-8 space-y-3">
+                        <div class="w-12 h-12 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto border border-amber-500/20">
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <span class="px-2.5 py-1 bg-amber-500/10 text-amber-400 rounded-full text-[10px] font-bold tracking-wider uppercase border border-amber-500/20">
+                                Control de Aditivos y Cereales Adjuntos
+                            </span>
+                            <h2 class="text-xl font-black text-zinc-100 mt-2">Verificador de Pureza</h2>
+                            <p class="text-xs text-zinc-400 max-w-xs mx-auto mt-1">
+                                Escanea el código EAN o busca en la base de datos para detectar maíz, arroz o azúcares añadidos.
+                            </p>
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+        </main>
+
+        <!-- SECCIÓN DE HISTORIAL -->
+        <main id="tabHistory" class="hidden space-y-4 flex-1">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-bold text-zinc-200 flex items-center space-x-2">
+                    <i data-lucide="history" class="w-4 h-4 text-amber-500"></i>
+                    <span>Historial de Escaneos</span>
+                </h2>
                 <div class="flex space-x-2">
-                    <button onclick="exportHistoryCSV()" class="p-2 bg-zinc-900 border border-zinc-800 text-xs text-amber-400 hover:bg-zinc-800 rounded-xl flex items-center space-x-1">
-                        <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                        <span>CSV</span>
-                    </button>
-                    <button onclick="clearHistory()" class="p-2 bg-zinc-900 border border-zinc-800 text-xs text-rose-400 hover:bg-zinc-800 rounded-xl flex items-center space-x-1">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                    </button>
+                    <button onclick="exportHistoryCSV()" class="text-xs text-amber-400 hover:underline">Exportar CSV</button>
+                    <span class="text-zinc-600">•</span>
+                    <button onclick="clearHistory()" class="text-xs text-rose-400 hover:underline">Borrar</button>
                 </div>
             </div>
 
-            <div id="historyContainer" class="space-y-2.5 max-h-96 overflow-y-auto custom-scrollbar pr-1">
-                <!-- Lista de Historial -->
+            <div id="historyContainer" class="space-y-2"></div>
+            <button onclick="switchTab('main')" class="w-full py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold rounded-xl text-zinc-300">Volver</button>
+        </main>
+
+        <!-- SECCIÓN DE ESTADÍSTICAS -->
+        <main id="tabStats" class="hidden space-y-4 flex-1">
+            <h2 class="text-sm font-bold text-zinc-200 flex items-center space-x-2">
+                <i data-lucide="bar-chart-2" class="w-4 h-4 text-amber-500"></i>
+                <span>Estadísticas de Pureza</span>
+            </h2>
+
+            <div class="glass-panel p-4 rounded-2xl space-y-4">
+                <div class="grid grid-cols-2 gap-3 text-center">
+                    <div class="p-3 bg-zinc-900/80 rounded-xl border border-zinc-800">
+                        <p id="statTotal" class="text-2xl font-black text-amber-400">0</p>
+                        <p class="text-[10px] text-zinc-400 font-bold uppercase">Evaluadas</p>
+                    </div>
+                    <div class="p-3 bg-zinc-900/80 rounded-xl border border-zinc-800">
+                        <p id="statPureRatio" class="text-2xl font-black text-emerald-400">0%</p>
+                        <p class="text-[10px] text-zinc-400 font-bold uppercase">Ratio Pureza</p>
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="flex justify-between text-xs font-bold">
+                        <span id="labelPureCount" class="text-emerald-400">Puras: 0</span>
+                        <span id="labelImpureCount" class="text-rose-400">Con Adjuntos: 0</span>
+                    </div>
+                    <div class="w-full h-3 bg-zinc-800 rounded-full overflow-hidden flex">
+                        <div id="barPure" class="bg-emerald-500 h-full transition-all duration-500" style="width: 50%;"></div>
+                        <div id="barImpure" class="bg-rose-500 h-full transition-all duration-500" style="width: 50%;"></div>
+                    </div>
+                </div>
             </div>
-        </section>
 
-        <!-- TAB 4: ESTADÍSTICAS -->
-        <section id="tabStats" class="hidden space-y-4">
-            <h3 class="text-lg font-bold text-zinc-100">Estadísticas de Pureza</h3>
-            
-            <div class="grid grid-cols-2 gap-3">
-                <div class="glass-panel p-4 rounded-2xl text-center">
-                    <span class="text-2xl font-black text-amber-400 block" id="statTotal">0</span>
-                    <span class="text-[10px] text-zinc-400 uppercase font-semibold">Cervezas Evaluadas</span>
-                </div>
-                <div class="glass-panel p-4 rounded-2xl text-center">
-                    <span class="text-2xl font-black text-emerald-400 block" id="statPureRatio">0%</span>
-                    <span class="text-[10px] text-zinc-400 uppercase font-semibold">Grado de Pureza Global</span>
-                </div>
-            </div>
+            <button onclick="switchTab('main')" class="w-full py-2.5 bg-zinc-900 border border-zinc-800 text-xs font-bold rounded-xl text-zinc-300">Volver</button>
+        </main>
 
-            <div class="glass-panel p-4 rounded-2xl space-y-3">
-                <h4 class="text-xs font-bold text-zinc-300">Desglose por Cumplimiento</h4>
-                <div class="w-full bg-zinc-800 rounded-full h-3 overflow-hidden flex">
-                    <div id="barPure" class="bg-emerald-500 h-full" style="width: 50%"></div>
-                    <div id="barImpure" class="bg-rose-500 h-full" style="width: 50%"></div>
+        <!-- REPRODUCTOR DE MÚSICA INFERIOR -->
+        <footer class="glass-panel p-3 rounded-2xl flex items-center justify-between text-xs text-zinc-400">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-8 h-8 bg-amber-500/10 text-amber-500 rounded-lg flex items-center justify-center border border-amber-500/20">
+                    <i data-lucide="disc" class="w-4 h-4 animate-spin-slow"></i>
                 </div>
-                <div class="flex justify-between text-[11px] font-medium">
-                    <span class="text-emerald-400" id="labelPureCount">Puras: 0</span>
-                    <span class="text-rose-400" id="labelImpureCount">Con Adjuntos: 0</span>
+                <div>
+                    <p class="font-bold text-zinc-200 text-[11px]">Mi Canción Personalizada</p>
+                    <p class="text-[9px] text-zinc-500">cancion.mp3</p>
                 </div>
             </div>
-        </section>
-
-    </main>
-
-    <!-- MODAL DE ESCÁNER DE CÁMARA CON ANÁLISIS EN VIVO -->
-    <div id="scannerModal" class="hidden fixed inset-0 bg-zinc-950/95 z-50 flex flex-col justify-between p-4 backdrop-blur-2xl">
-        <div class="flex justify-between items-center max-w-lg w-full mx-auto">
-            <div class="flex items-center space-x-2">
-                <span class="w-2.5 h-2.5 bg-amber-500 rounded-full animate-ping"></span>
-                <span class="text-xs font-bold text-zinc-200">Escáner Óptico de Código de Barras</span>
-            </div>
-            <button onclick="closeScanner()" class="p-2 bg-zinc-900 text-zinc-400 hover:text-white rounded-full border border-zinc-800">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-        </div>
-
-        <div class="max-w-lg w-full mx-auto my-auto space-y-3">
-            <div id="reader" class="w-full bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-800 shadow-2xl"></div>
-            
-            <div class="flex items-center justify-between bg-zinc-900/90 p-3 rounded-2xl border border-zinc-800 text-xs">
-                <div class="flex items-center space-x-2">
-                    <i data-lucide="camera" class="w-4 h-4 text-amber-500"></i>
-                    <select id="cameraSelect" onchange="switchCamera(this.value)" class="bg-zinc-800 text-zinc-200 border border-zinc-700 rounded-xl px-2.5 py-1 focus:outline-none"></select>
-                </div>
-                <button onclick="toggleTorch()" id="torchBtn" class="px-3 py-1 bg-zinc-800 text-zinc-400 hover:text-amber-400 border border-zinc-700 rounded-xl flex items-center space-x-1">
-                    <i data-lucide="zap" class="w-3.5 h-3.5"></i>
-                    <span>Flash</span>
+            <div class="flex items-center space-x-1">
+                <button onclick="toggleMusic()" class="p-2 text-zinc-300 hover:text-amber-400 transition rounded-lg hover:bg-zinc-800/50">
+                    <i data-lucide="play" id="musicPlayIcon" class="w-4 h-4"></i>
+                </button>
+                <button onclick="toggleMusic()" class="p-2 text-zinc-400 hover:text-zinc-200 transition rounded-lg hover:bg-zinc-800/50">
+                    <i data-lucide="skip-forward" class="w-4 h-4"></i>
                 </button>
             </div>
+        </footer>
+
+        <!-- CRÉDITOS Y PIE -->
+        <div class="text-center text-[10px] text-zinc-600 space-y-1 pb-2">
+            <p class="flex items-center justify-center space-x-1">
+                <span>🍺</span>
+                <span class="hover:text-zinc-400 cursor-pointer">Apoyar Proyecto</span>
+            </p>
+            <p>PacoliScanner PRO © 2026 • Auditoría algorítmica de ingredientes conforme a la Ley de 1516.</p>
         </div>
 
-        <p class="text-center text-[11px] text-zinc-500 max-w-xs mx-auto">
-            Apunta la cámara al código EAN-13 del envase para analizar la composición de ingredientes.
-        </p>
+    </div>
+
+    <!-- MODAL: ESCÁNER CÁMARA -->
+    <div id="scannerModal" class="hidden fixed inset-0 bg-zinc-950/90 backdrop-blur-md z-50 flex flex-col justify-between p-4">
+        <div class="flex justify-between items-center text-zinc-200">
+            <h3 class="font-bold text-sm flex items-center space-x-2">
+                <i data-lucide="camera" class="w-4 h-4 text-amber-500"></i>
+                <span>Escáner de Código de Barras</span>
+            </h3>
+            <button onclick="closeScanner()" class="p-2 text-zinc-400 hover:text-zinc-100">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <div class="relative w-full max-w-sm mx-auto my-auto overflow-hidden rounded-2xl border border-amber-500/30 shadow-2xl bg-black">
+            <div id="reader" class="w-full"></div>
+        </div>
+
+        <div class="flex justify-center space-x-3 pb-4">
+            <select id="cameraSelect" onchange="switchCamera(this.value)" class="bg-zinc-900 text-zinc-300 text-xs rounded-xl px-3 py-2 border border-zinc-800 focus:outline-none"></select>
+            <button onclick="toggleTorch()" class="p-2.5 bg-zinc-900 text-amber-400 rounded-xl border border-zinc-800">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+            </button>
+        </div>
     </div>
 
     <!-- MODAL: AÑADIR CERVEZA MANUALMENTE -->
-    <div id="customBeerModal" class="hidden fixed inset-0 bg-zinc-950/90 z-50 flex items-center justify-center p-4 backdrop-blur-md">
-        <div class="glass-panel max-w-md w-full p-6 rounded-3xl space-y-4 shadow-2xl border border-zinc-800">
+    <div id="customBeerModal" class="hidden fixed inset-0 bg-zinc-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="glass-panel max-w-sm w-full p-5 rounded-2xl space-y-4 border border-zinc-800">
             <div class="flex justify-between items-center">
-                <h3 class="text-base font-bold text-zinc-100">Añadir Cerveza a la Base Local</h3>
+                <h3 class="font-bold text-sm text-zinc-100">Añadir Cerveza Manualmente</h3>
                 <button onclick="closeCustomBeerModal()" class="text-zinc-500 hover:text-zinc-300">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
@@ -209,80 +235,73 @@
 
             <form onsubmit="saveCustomBeer(event)" class="space-y-3 text-xs">
                 <div>
-                    <label class="block text-zinc-400 mb-1">Nombre de la Cerveza</label>
-                    <input type="text" id="customName" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-zinc-100 focus:outline-none focus:border-amber-500">
+                    <label class="block text-zinc-400 mb-1">Nombre</label>
+                    <input type="text" id="customName" required placeholder="Ej: Alhambra Reserva 1925" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-zinc-100 focus:outline-none focus:border-amber-500">
                 </div>
                 <div>
-                    <label class="block text-zinc-400 mb-1">Marca / Cervecera</label>
-                    <input type="text" id="customBrand" required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-zinc-100 focus:outline-none focus:border-amber-500">
+                    <label class="block text-zinc-400 mb-1">Marca / Fabricante</label>
+                    <input type="text" id="customBrand" required placeholder="Ej: Cervezas Alhambra" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-zinc-100 focus:outline-none focus:border-amber-500">
                 </div>
                 <div>
-                    <label class="block text-zinc-400 mb-1">Código EAN-13 (Opcional)</label>
+                    <label class="block text-zinc-400 mb-1">Código EAN (Opcional)</label>
                     <input type="text" id="customEAN" placeholder="Ej: 8410000000000" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-zinc-100 focus:outline-none focus:border-amber-500">
                 </div>
                 <div>
                     <label class="block text-zinc-400 mb-1">Ingredientes (Separados por coma)</label>
-                    <input type="text" id="customIngredients" placeholder="Agua, Malta de Cebada, Lúpulo, Maíz..." required class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-zinc-100 focus:outline-none focus:border-amber-500">
+                    <textarea id="customIngredients" required placeholder="Agua, Malta de Cebada, Lúpulo, Maíz..." class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-2.5 text-zinc-100 focus:outline-none focus:border-amber-500 h-20"></textarea>
                 </div>
-
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold py-3 rounded-xl transition mt-2">
-                    Guardar Cerveza
+                <button type="submit" class="w-full py-2.5 bg-amber-500 text-zinc-950 font-bold rounded-xl hover:bg-amber-400 transition">
+                    Guardar y Evaluar
                 </button>
             </form>
         </div>
     </div>
 
-    <!-- FOOTER Y CRÉDITOS -->
-    <footer class="border-t border-zinc-900 bg-zinc-950/80 p-4 text-center space-y-3">
-        
-        <!-- REPRODUCTOR COMPACTO DE MÚSICA -->
-        <div class="glass-panel max-w-xs mx-auto p-2.5 rounded-2xl flex items-center justify-between border border-zinc-800/80 text-xs shadow-lg">
-            <div class="flex items-center space-x-2 text-left truncate max-w-[150px]">
-                <i data-lucide="disc" class="w-4 h-4 text-amber-500 animate-spin" style="animation-duration: 4s;"></i>
-                <span id="currentTrackTitle" class="text-[11px] text-zinc-300 font-medium truncate">Música Ambient Lo-Fi</span>
-            </div>
-            <div class="flex items-center space-x-1.5">
-                <button onclick="toggleAudioBGM()" id="bgmPlayBtn" title="Reproducir / Pausar" class="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-amber-400 rounded-xl transition flex items-center justify-center">
-                    <i data-lucide="play" class="w-3.5 h-3.5" id="bgmPlayIcon"></i>
-                </button>
-                <button onclick="nextTrack()" title="Siguiente canción" class="p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-amber-400 rounded-xl transition flex items-center justify-center">
-                    <i data-lucide="skip-forward" class="w-3.5 h-3.5"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="flex justify-center items-center space-x-4 text-xs text-zinc-400 pt-1">
-            <a href="https://buymeacoffee.com" target="_blank" class="hover:text-amber-400 transition flex items-center space-x-1">
-                <span>☕ Apoyar Proyecto</span>
-            </a>
-        </div>
-        <p class="text-[10px] text-zinc-600">
-            PacoliScanner PRO © 2026 • Auditoría algorítmica de ingredientes conforme a la Ley de 1516.
-        </p>
-    </footer>
-
-    <!-- LÓGICA DE LA APLICACIÓN -->
+    <!-- LOGICA JAVASCRIPT -->
     <script>
+        // Inicializar Iconos
         lucide.createIcons();
 
         // -------------------------------------------------------------
-        // 1. SINTETIZADOR DE AUDIO INTEGRADO (Web Audio API)
+        // 1. REPRODUCTOR DE MÚSICA Y EFECTOS DE SONIDO (AudioContext)
         // -------------------------------------------------------------
         let audioCtx = null;
         let isMuted = false;
+        let isMusicPlaying = false;
+        const bgMusic = document.getElementById('bgMusic');
 
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleMusic() {
+            initAudio();
+            const musicBtn = document.getElementById('musicPlayIcon');
+            
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                isMusicPlaying = false;
+                if (musicBtn) musicBtn.setAttribute('data-lucide', 'play');
+            } else {
+                bgMusic.play().then(() => {
+                    isMusicPlaying = true;
+                    if (musicBtn) musicBtn.setAttribute('data-lucide', 'pause');
+                }).catch(err => {
+                    console.error("Error al reproducir cancion.mp3:", err);
+                });
+            }
+            lucide.createIcons();
         }
 
         function playSound(type) {
             if (isMuted) return;
             initAudio();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (!audioCtx) return;
 
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
@@ -291,176 +310,183 @@
 
             const now = audioCtx.currentTime;
 
-            if (type === 'scan') {
+            if (type === 'pure') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                osc.start(now);
-                osc.stop(now + 0.1);
-            } else if (type === 'pure') {
-                osc.type = 'triangle';
                 osc.frequency.setValueAtTime(523.25, now); // C5
-                osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
-                osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
-                gain.gain.setValueAtTime(0.25, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-                osc.start(now);
-                osc.stop(now + 0.4);
-            } else if (type === 'impure') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(220, now); // A3
-                osc.frequency.setValueAtTime(180, now + 0.15);
-                gain.gain.setValueAtTime(0.3, now);
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.15); // E5
+                gain.gain.setValueAtTime(0.15, now);
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                 osc.start(now);
                 osc.stop(now + 0.3);
+            } else if (type === 'impure') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now); // A3
+                osc.frequency.exponentialRampToValueAtTime(164.81, now + 0.2); // E3
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'scan') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(880, now); // A5
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
             }
         }
 
-        function toggleMute() {
+        function toggleMuteSound() {
             isMuted = !isMuted;
-            const btn = document.getElementById("audioToggleBtn");
-            const icon = document.getElementById("audioIcon");
-
-            if (isMuted) {
-                btn.classList.replace("text-amber-400", "text-zinc-600");
-                icon.setAttribute("data-lucide", "volume-x");
-            } else {
-                btn.classList.replace("text-zinc-600", "text-amber-400");
-                icon.setAttribute("data-lucide", "volume-2");
-                playSound('scan');
-            }
+            const btn = document.getElementById("soundToggleBtn");
+            btn.innerHTML = isMuted 
+                ? `<i data-lucide="volume-x" class="w-5 h-5 text-rose-400"></i>` 
+                : `<i data-lucide="volume-2" class="w-5 h-5 text-zinc-400"></i>`;
             lucide.createIcons();
         }
 
         // -------------------------------------------------------------
-        // REPRODUCTOR DE MÚSICA DE FONDO Y LISTA DE REPRODUCCIÓN
+        // 2. NAVEGACIÓN Y PESTAÑAS
         // -------------------------------------------------------------
-        const playlist = [
-            { title: "Música Ambient Lo-Fi", src: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" },
-            { title: "Mi Canción Personalizada", src: "cancion.mp3" } // Cambia 'cancion.mp3' por el nombre de tu archivo en GitHub
-        ];
-        let currentTrackIndex = 0;
+        function switchTab(tab) {
+            document.getElementById("tabMain").classList.add("hidden");
+            document.getElementById("tabHistory").classList.add("hidden");
+            document.getElementById("tabStats").classList.add("hidden");
 
-        function toggleAudioBGM() {
-            const bgm = document.getElementById("bgMusic");
-            const playIcon = document.getElementById("bgmPlayIcon");
-            if (bgm.paused) {
-                bgm.play().then(() => {
-                    if (playIcon) playIcon.setAttribute("data-lucide", "pause");
-                    lucide.createIcons();
-                }).catch(() => alert("Interactúa con la pantalla primero para activar el audio."));
-            } else {
-                bgm.pause();
-                if (playIcon) playIcon.setAttribute("data-lucide", "play");
-                lucide.createIcons();
+            if (tab === 'main' || tab === 'result') {
+                document.getElementById("tabMain").classList.remove("hidden");
+            } else if (tab === 'history') {
+                renderHistory();
+                document.getElementById("tabHistory").classList.remove("hidden");
+            } else if (tab === 'stats') {
+                renderStats();
+                document.getElementById("tabStats").classList.remove("hidden");
             }
         }
 
-        function nextTrack() {
-            currentTrackIndex = (currentTrackIndex + 1) % playlist.length;
-            const bgm = document.getElementById("bgMusic");
-            const track = playlist[currentTrackIndex];
-            
-            bgm.src = track.src;
-            document.getElementById("currentTrackTitle").innerText = track.title;
-
-            bgm.play().then(() => {
-                const playIcon = document.getElementById("bgmPlayIcon");
-                if (playIcon) playIcon.setAttribute("data-lucide", "pause");
-                lucide.createIcons();
-            }).catch(() => {
-                const playIcon = document.getElementById("bgmPlayIcon");
-                if (playIcon) playIcon.setAttribute("data-lucide", "play");
-                lucide.createIcons();
-            });
-        }
-
         // -------------------------------------------------------------
-        // 2. BASE DE DATOS LOCAL AMPLIADA DE CERVEZAS
+        // 3. BASE DE DATOS LOCAL Y CERVEZAS CUSTOM
         // -------------------------------------------------------------
-        const dbBarcodes = {
-            "8412599000010": { name: "Estrella Galicia Especial", brand: "Hijos de Rivera", purity: "No Cumple (Contiene Maíz)", status: "nocumple", ingredients: ["Agua", "Malta de Cebada", "Maíz", "Lúpulo"], details: "Incorpora adjuntos de maíz no malteado para suavizar el paladar. No cumple con el decreto de 1516.", score: "8.5/10", color: "from-amber-950 via-zinc-900 to-zinc-950" },
-            "8410793100108": { name: "Voll-Damm Doble Malta", brand: "Damm", purity: "100% Pura", status: "cumple", ingredients: ["Agua", "100% Malta de Cebada", "Lúpulo", "Levadura"], details: "Cuerpo intenso elaborado exclusivamente con malta de cebada, agua y lúpulo de gran calidad.", score: "9.3/10", color: "from-amber-900 via-stone-900 to-zinc-950" },
-            "8410261012014": { name: "Alhambra Reserva 1925", brand: "Grupo Mahou-San Miguel", purity: "100% Pura", status: "cumple", ingredients: ["Agua", "Malta de Cebada", "Lúpulo Saaz", "Levadura"], details: "Elaboración artesanal en Granada utilizando únicamente maltas de cebada y flor de lúpulo Saaz.", score: "9.6/10", color: "from-emerald-950 via-zinc-900 to-zinc-950" },
-            "8410113002213": { name: "Mahou Cinco Estrellas", brand: "Mahou", purity: "No Cumple", status: "nocumple", ingredients: ["Agua", "Malta de Cebada", "Maíz", "Lúpulo"], details: "Contiene maíz como adjunto cervecero para abaratar el extracto seco. Fuera de la norma de pureza.", score: "5.5/10", color: "from-red-950 via-zinc-900 to-zinc-950" },
-            "8410543001008": { name: "Cruzcampo Especial", brand: "Heineken España", purity: "No Cumple", status: "nocumple", ingredients: ["Agua", "Malta de Cebada", "Maíz", "Lúpulo", "Extracto de Lúpulo"], details: "Receta industrial con extractos y cereales no malteados.", score: "4.8/10", color: "from-orange-950 via-zinc-900 to-zinc-950" },
-            "8411090032000": { name: "Cruzcampo Pilsen (1 Litro)", brand: "Heineken España", purity: "No Cumple", status: "nocumple", ingredients: ["Agua", "Malta de Cebada", "Maíz", "Lúpulo", "Extracto de Lúpulo", "Levadura"], details: "Formato de 1L. Cerveza lager pilsen industrial elaborada con maíz no malteado como ingrediente adjunto y extractos de lúpulo. Fuera de la norma de 1516.", score: "4.8/10", color: "from-orange-950 via-zinc-900 to-zinc-950" },
-            "8712000028886": { name: "Heineken Original", brand: "Heineken", purity: "100% Pura", status: "cumple", ingredients: ["Agua", "Malta de Cebada", "Lúpulo", "Levadura A-Yeast"], details: "Elaborada en tanques horizontales solo con agua, malta de cebada y lúpulo natural.", score: "7.8/10", color: "from-green-950 via-zinc-900 to-zinc-950" },
-            "7501064191002": { name: "Coronita Extra", brand: "Grupo Modelo", purity: "No Cumple", status: "nocumple", ingredients: ["Agua", "Malta de Cebada", "Arroz", "Maíz", "Lúpulo", "Ascorbatos"], details: "Contiene adjuntos de arroz y maíz, además de antioxidantes químicos para conservación.", score: "4.0/10", color: "from-yellow-950 via-zinc-900 to-zinc-950" },
-            "4006328011028": { name: "Franziskaner Hefe-Weissbier", brand: "Spaten-Franziskaner", purity: "100% Pura (Estilo Trigo)", status: "cumple", ingredients: ["Agua", "Malta de Trigo", "Malta de Cebada", "Levadura", "Lúpulo"], details: "Cerveza bávara tradicional de trigo conforme a la norma de pureza germánica.", score: "9.7/10", color: "from-amber-900 via-zinc-900 to-zinc-950" },
-            "4008248000021": { name: "Paulaner Hefe-Weißbier", brand: "Paulaner Brauerei", purity: "100% Pura", status: "cumple", ingredients: ["Agua", "Malta de Trigo", "Malta de Cebada", "Levadura", "Lúpulo"], details: "Múnich. Ingredientes naturales seleccionados, sin filtrado pastelero.", score: "9.8/10", color: "from-amber-950 via-zinc-900 to-zinc-950" },
-            "8410793000620": { name: "Estrella Damm Lager", brand: "Damm", purity: "No Cumple", status: "nocumple", ingredients: ["Agua", "Malta de Cebada", "Arroz", "Lúpulo"], details: "Elaborada según la receta mediterránea que incluye arroz para mayor ligereza.", score: "6.2/10", color: "from-rose-950 via-zinc-900 to-zinc-950" },
-            "8410113003050": { name: "Mahou Maestra Doble Lúpulo", brand: "Mahou", purity: "100% Pura", status: "cumple", ingredients: ["Agua", "Malta de Cebada", "Lúpulo", "Levadura"], details: "Variante de especialidad elaborada exclusivamente con malta y dos momentos de lupulado.", score: "8.9/10", color: "from-stone-900 via-zinc-900 to-zinc-950" },
-            "8412599000188": { name: "1906 Reserva Especial", brand: "Hijos de Rivera", purity: "100% Pura", status: "cumple", ingredients: ["Agua", "Malta de Cebada Roasted", "Lúpulo Perle", "Levadura"], details: "Maltas tostadas y lúpulo Perle de alta calidad. Sin maíz ni arroz.", score: "9.5/10", color: "from-amber-950 via-zinc-900 to-zinc-950" },
-            "5411648001016": { name: "Chimay Red Premiere", brand: "Bières de Chimay (Trapense)", purity: "100% Pura Trapense", status: "cumple", ingredients: ["Agua", "Malta de Cebada", "Trigo", "Azúcar de Candel", "Lúpulo", "Levadura"], details: "Cerveza trapense belga. Utiliza azúcar candi tradicional para la refermentación en botella (permitido en la tradición trapense).", score: "9.9/10", color: "from-amber-900 via-red-950 to-zinc-950" }
+        const defaultBeers = {
+            "8410000001925": {
+                name: "Alhambra Reserva 1925",
+                brand: "Cervezas Alhambra",
+                purity: "No Cumple (Contiene Maíz)",
+                status: "nocumple",
+                ingredients: ["Agua", "Malta de Cebada", "Maíz", "Lúpulo"],
+                details: "Contiene maíz como adjunto cervecero no malteado para aligerar cuerpo y costes de fabricación. No cumple la Ley de Pureza de 1516.",
+                score: "6.2/10",
+                color: "from-amber-950/40 via-zinc-950 to-zinc-950"
+            },
+            "8410000019060": {
+                name: "1906 Reserva Especial",
+                brand: "Estrella Galicia",
+                purity: "No Cumple (Contiene Maíz)",
+                status: "nocumple",
+                ingredients: ["Agua", "Malta de Cebada", "Maíz", "Lúpulo"],
+                details: "Utiliza maíz adjunto en el proceso de maceración. Desvía de la norma de pureza tradicional alemana.",
+                score: "6.8/10",
+                color: "from-amber-950/40 via-zinc-950 to-zinc-950"
+            },
+            "8410000000050": {
+                name: "Mahou Cinco Estrellas",
+                brand: "Mahou",
+                purity: "No Cumple (Contiene Maíz)",
+                status: "nocumple",
+                ingredients: ["Agua", "Malta de Cebada", "Maíz", "Lúpulo"],
+                details: "Receta industrial clásica con adición de maíz para estabilizar sabor e industrialización.",
+                score: "5.5/10",
+                color: "from-rose-950/40 via-zinc-950 to-zinc-950"
+            },
+            "8410000004100": {
+                name: "Cruzcampo Especial",
+                brand: "Cruzcampo",
+                purity: "No Cumple (Contiene Maíz y Lúpulo Extracto)",
+                status: "nocumple",
+                ingredients: ["Agua", "Malta de Cebada", "Maíz", "Lúpulo", "Extracto de Lúpulo"],
+                details: "Incorpora adjuntos de maíz. Emplea extractos de lúpulo para estandarizar amargor.",
+                score: "4.8/10",
+                color: "from-rose-950/40 via-zinc-950 to-zinc-950"
+            },
+            "4008240000134": {
+                name: "Paulaner Hefe-Weißbier",
+                brand: "Paulaner Brauerei",
+                purity: "100% Pura (Ley de Pureza 1516)",
+                status: "cumple",
+                ingredients: ["Agua", "Malta de Trigo", "Malta de Cebada", "Levadura", "Lúpulo"],
+                details: "Cerveza de trigo tradicional bávara. Elaborada estrictamente conforme a la ordenanza histórica de pureza.",
+                score: "9.6/10",
+                color: "from-emerald-950/40 via-zinc-950 to-zinc-950"
+            },
+            "4006314000011": {
+                name: "Franziskaner Weissbier",
+                brand: "Spaten-Franziskaner-Bräu",
+                purity: "100% Pura",
+                status: "cumple",
+                ingredients: ["Agua", "Malta de Trigo", "Malta de Cebada", "Levadura", "Extracto de Lúpulo"],
+                details: "Elaboración tradicional alemana con malta noble y fermentación superior de trigo.",
+                score: "9.4/10",
+                color: "from-emerald-950/40 via-zinc-950 to-zinc-950"
+            }
         };
 
-        // Custom Beers en LocalStorage
         function getCustomBeers() {
             return JSON.parse(localStorage.getItem('pacoli_custom_beers') || '{}');
         }
 
         function getAllBeers() {
-            return { ...dbBarcodes, ...getCustomBeers() };
+            return { ...defaultBeers, ...getCustomBeers() };
         }
 
         // -------------------------------------------------------------
-        // 3. CONTROLADOR DE VISTAS (TABS)
+        // 4. BÚSQUEDA Y FILTRADO
         // -------------------------------------------------------------
-        function switchTab(tabName) {
-            document.getElementById("tabSearch").classList.add("hidden");
-            document.getElementById("tabResult").classList.add("hidden");
-            document.getElementById("tabHistory").classList.add("hidden");
-            document.getElementById("tabStats").classList.add("hidden");
-
-            if (tabName === 'search') {
-                document.getElementById("tabSearch").classList.remove("hidden");
-                resetBg();
-            } else if (tabName === 'result') {
-                document.getElementById("tabResult").classList.remove("hidden");
-            } else if (tabName === 'history') {
-                document.getElementById("tabHistory").classList.remove("hidden");
-                renderHistory();
-                resetBg();
-            } else if (tabName === 'stats') {
-                document.getElementById("tabStats").classList.remove("hidden");
-                renderStats();
-                resetBg();
-            }
-        }
-
-        function resetBg() {
-            document.getElementById("appBody").className = "dynamic-bg bg-zinc-950 text-zinc-100 min-h-screen font-sans flex flex-col justify-between selection:bg-amber-500 selection:text-zinc-950";
-        }
-
-        // -------------------------------------------------------------
-        // 4. MOTOR DE BÚSQUEDA Y SUGERENCIAS
-        // -------------------------------------------------------------
-        function handleSearch(query) {
+        function searchBeers() {
+            const query = document.getElementById("searchInput").value.trim().toLowerCase();
             const suggestionsEl = document.getElementById("suggestions");
             const clearBtn = document.getElementById("clearBtn");
 
-            if (query.trim().length === 0) {
-                clearBtn.classList.add("hidden");
-                suggestionsEl.classList.add("hidden");
+            if (!query) {
+                clearSearch();
                 return;
             }
 
             clearBtn.classList.remove("hidden");
-            const cleanQuery = query.toLowerCase().trim();
-            const allBeers = Object.values(getAllBeers());
-
-            const matches = allBeers.filter(b => 
-                b.name.toLowerCase().includes(cleanQuery) || 
-                b.brand.toLowerCase().includes(cleanQuery) ||
-                b.ingredients.some(i => i.toLowerCase().includes(cleanQuery))
+            const allBeers = getAllBeers();
+            const matches = Object.values(allBeers).filter(b => 
+                b.name.toLowerCase().includes(query) || 
+                b.brand.toLowerCase().includes(query) ||
+                b.ingredients.some(i => i.toLowerCase().includes(query))
             );
 
-            if (matches.length > 0) {
-                suggestionsEl.innerHTML = matches.map(b => `
+            showSearchResultsList(matches, "Resultados de la búsqueda");
+        }
+
+        function clearSearch() {
+            document.getElementById("searchInput").value = "";
+            document.getElementById("suggestions").classList.add("hidden");
+            document.getElementById("clearBtn").classList.add("hidden");
+        }
+
+        function filterCategory(type) {
+            const beers = Object.values(getAllBeers());
+            if (type === 'puras') {
+                const pureList = beers.filter(b => b.status === 'cumple');
+                showSearchResultsList(pureList, "Cervezas 100% Puras");
+            } else if (type === 'trigo') {
+                const wheatList = beers.filter(b => b.ingredients.some(i => i.toLowerCase().includes('trigo')));
+                showSearchResultsList(wheatList, "Cervezas Alemanas de Trigo");
+            }
+        }
+
+        function showSearchResultsList(list, title) {
+            const suggestionsEl = document.getElementById("suggestions");
+            if (!list.length) {
+                suggestionsEl.innerHTML = `<div class="p-4 text-center text-xs text-zinc-500">No se encontraron resultados para esta categoría.</div>`;
+            } else {
+                suggestionsEl.innerHTML = `
+                    <div class="px-3 py-2 bg-zinc-950 border-b border-zinc-800 text-[11px] font-bold text-amber-500 uppercase tracking-wider">${title}</div>
+                    ` + list.map(b => `
                     <div onclick='selectBeer(${JSON.stringify(b).replace(/'/g, "&apos;")})' class="p-3.5 hover:bg-zinc-800/90 cursor-pointer border-b border-zinc-800/60 last:border-none flex justify-between items-center transition">
                         <div>
                             <p class="font-bold text-sm text-zinc-100">${b.name}</p>
@@ -471,141 +497,81 @@
                         </span>
                     </div>
                 `).join('');
-                suggestionsEl.classList.remove("hidden");
-            } else {
-                suggestionsEl.innerHTML = `
-                    <div class="p-4 text-center text-xs text-zinc-500">
-                        No hay coincidencias en la base local. Haz clic en "Escanear" para buscar online.
-                    </div>
-                `;
-                suggestionsEl.classList.remove("hidden");
             }
-        }
-
-        function clearSearch() {
-            document.getElementById("searchInput").value = "";
-            document.getElementById("clearBtn").classList.add("hidden");
-            document.getElementById("suggestions").classList.add("hidden");
-        }
-
-        function quickFilter(type) {
-            const beers = Object.values(getAllBeers());
-            if (type === 'puras') {
-                const pureList = beers.filter(b => b.status === 'cumple');
-                selectBeer(pureList[Math.floor(Math.random() * pureList.length)]);
-            } else if (type === 'trigo') {
-                const trigo = beers.find(b => b.name.toLowerCase().includes('franziskaner') || b.name.toLowerCase().includes('paulaner'));
-                if (trigo) selectBeer(trigo);
-            }
+            suggestionsEl.classList.remove("hidden");
         }
 
         // -------------------------------------------------------------
-        // 5. RENDERING DE RESULTADO Y ANÁLISIS
+        // 5. EVALUACIÓN Y FICHA TÉCNICA DE CERVEZA
         // -------------------------------------------------------------
         function selectBeer(beer) {
             clearSearch();
-            switchTab('result');
-
-            // Audio Feedback
-            if (beer.status === 'cumple') {
-                playSound('pure');
-            } else {
-                playSound('impure');
-            }
-
-            // Guardar en Historial Persistente
-            saveToHistory(beer);
-
-            // Cambiar Gradiente Dinámico de Fondo
-            document.getElementById("appBody").className = `dynamic-bg bg-gradient-to-b ${beer.color || 'from-zinc-900 to-zinc-950'} text-zinc-100 min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-zinc-950`;
-
-            const isPure = beer.status === 'cumple';
             const card = document.getElementById("beerCard");
+            const isPure = beer.status === 'cumple';
+
+            playSound(isPure ? 'pure' : 'impure');
+
+            const appBody = document.getElementById("appBody");
+            appBody.className = `dynamic-bg bg-gradient-to-b ${beer.color || (isPure ? 'from-emerald-950/40 via-zinc-950 to-zinc-950' : 'from-rose-950/40 via-zinc-950 to-zinc-950')} text-zinc-100 min-h-screen font-sans flex flex-col justify-between selection:bg-amber-500 selection:text-zinc-950`;
+
+            const statusBadge = isPure 
+                ? `<span class="inline-flex items-center space-x-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full text-xs font-bold"><span>✅</span><span>Cumple Ley de Pureza (1516)</span></span>`
+                : `<span class="inline-flex items-center space-x-1.5 px-3 py-1 bg-rose-500/10 border border-rose-500/30 text-rose-400 rounded-full text-xs font-bold"><span>⚠️</span><span>No Cumple Ley de Pureza</span></span>`;
 
             card.innerHTML = `
                 <div class="flex justify-between items-start">
                     <div>
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-500">${beer.brand}</span>
-                        <h3 class="text-2xl font-black text-white leading-tight">${beer.name}</h3>
+                        <p class="text-xs text-amber-500 font-semibold uppercase tracking-wider">${beer.brand}</p>
+                        <h2 class="text-xl font-black text-zinc-100 leading-tight">${beer.name}</h2>
                     </div>
                     <div class="text-right">
-                        <span class="text-xl font-black text-amber-400 block">${beer.score}</span>
-                        <span class="text-[9px] text-zinc-400 uppercase">Nota Pureza</span>
+                        <span class="text-2xl font-black text-amber-400">${beer.score}</span>
+                        <p class="text-[9px] text-zinc-500 uppercase font-bold">Puntuación</p>
                     </div>
                 </div>
 
-                <!-- Dictamen Ley de Pureza -->
-                <div class="p-3.5 rounded-2xl ${isPure ? 'bg-emerald-950/50 border border-emerald-500/40 text-emerald-300' : 'bg-rose-950/50 border border-rose-500/40 text-rose-300'} flex items-center space-x-3 shadow-inner">
-                    <div class="text-3xl">${isPure ? '📜✅' : '🚫'}</div>
-                    <div>
-                        <p class="text-xs font-bold">${beer.purity}</p>
-                        <p class="text-[10px] text-zinc-400">Evaluado bajo la Reinheitsgebot (1516)</p>
-                    </div>
-                </div>
+                <div>${statusBadge}</div>
 
-                <!-- Lista Desglosada de Ingredientes -->
-                <div class="space-y-2">
-                    <h4 class="text-xs font-semibold text-zinc-300 flex items-center space-x-1">
-                        <i data-lucide="list-checks" class="w-4 h-4 text-amber-500"></i>
-                        <span>Ingredientes Evaluados:</span>
+                <div class="space-y-2 pt-1">
+                    <h4 class="text-xs font-bold text-zinc-300 uppercase tracking-wider flex items-center space-x-1">
+                        <i data-lucide="list" class="w-3.5 h-3.5 text-amber-500"></i>
+                        <span>Ingredientes Registrados</span>
                     </h4>
                     <div class="flex flex-wrap gap-1.5">
                         ${beer.ingredients.map(ing => {
-                            const isAdjunct = ["maíz", "arroz", "azúcar", "jarabe", "ascorbatos", "extracto"].some(adj => ing.toLowerCase().includes(adj));
-                            return `
-                                <span class="px-2.5 py-1 rounded-xl text-xs font-medium ${isAdjunct ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-zinc-800 text-zinc-300 border border-zinc-700/60'} flex items-center space-x-1">
-                                    <span>${ing}</span>
-                                    <span>${isAdjunct ? '❌' : '✓'}</span>
-                                </span>
-                            `;
+                            const lower = ing.toLowerCase();
+                            const isAdjunct = lower.includes('maíz') || lower.includes('arroz') || lower.includes('azúcar') || lower.includes('ascorbat') || lower.includes('extracto');
+                            const chipClass = isAdjunct 
+                                ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' 
+                                : 'bg-zinc-800 text-zinc-300 border-zinc-700';
+                            return `<span class="px-2.5 py-1 rounded-lg text-xs font-medium border ${chipClass}">${ing}</span>`;
                         }).join('')}
                     </div>
                 </div>
 
-                <!-- Comentario Técnico -->
-                <div class="bg-zinc-950/70 p-4 rounded-2xl border border-zinc-800/80 text-xs text-zinc-300 leading-relaxed space-y-1">
-                    <p class="font-bold text-amber-400 text-[11px]">Análisis Sommelier Cervecero:</p>
-                    <p>${beer.details}</p>
-                </div>
-
-                <!-- Enlaces de Monetización y Compartir -->
-                <div class="pt-2 space-y-2">
-                    <a href="https://www.amazon.es/s?k=cerveza+${encodeURIComponent(beer.name)}&tag=pacolis-21" target="_blank" 
-                       class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-bold py-3 px-4 rounded-2xl text-xs transition flex items-center justify-center space-x-2 shadow-lg shadow-amber-950/40">
-                        <i data-lucide="shopping-cart" class="w-4 h-4"></i>
-                        <span>Buscar Ofertas en Amazon (Afiliado)</span>
-                    </a>
-                    
-                    <button onclick="shareBeer('${beer.name}')" class="w-full bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-semibold py-2.5 px-4 rounded-2xl text-xs transition flex items-center justify-center space-x-2 border border-zinc-800">
-                        <i data-lucide="share-2" class="w-3.5 h-3.5"></i>
-                        <span>Compartir informe</span>
-                    </button>
+                <div class="p-3.5 bg-zinc-900/90 rounded-2xl border border-zinc-800/80 text-xs text-zinc-300 leading-relaxed">
+                    <p class="font-bold text-amber-400/90 mb-1">Dictamen del Analista:</p>
+                    ${beer.details}
                 </div>
             `;
-            lucide.createIcons();
-        }
 
-        function shareBeer(name) {
-            if (navigator.share) {
-                navigator.share({ title: `PacoliScanner - ${name}`, text: `Mira el informe de pureza para ${name}:`, url: window.location.href });
-            } else {
-                alert(`Informe de ${name} listo para compartir.`);
-            }
+            lucide.createIcons();
+            addToHistory(beer);
+            switchTab('result');
         }
 
         // -------------------------------------------------------------
-        // 6. HISTORIAL PERSISTENTE Y EXPORTACIÓN A CSV
+        // 6. HISTORIAL PERSISTENTE (LocalStorage)
         // -------------------------------------------------------------
         function getHistory() {
             return JSON.parse(localStorage.getItem('pacoli_scan_history') || '[]');
         }
 
-        function saveToHistory(beer) {
+        function addToHistory(beer) {
             let history = getHistory();
-            // Filtrar duplicados recientes
             history = history.filter(item => item.name !== beer.name);
-            history.unshift({ ...beer, timestamp: new Date().toLocaleString() });
-            if (history.length > 30) history.pop();
+            history.unshift({ ...beer, timestamp: new Date().toLocaleString('es-ES') });
+            if (history.length > 50) history.pop();
             localStorage.setItem('pacoli_scan_history', JSON.stringify(history));
             updateHistoryBadge();
         }
@@ -626,25 +592,28 @@
             const history = getHistory();
 
             if (history.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-zinc-500 py-8">No hay registros escaneados aún.</p>`;
+                container.innerHTML = `
+                    <div class="text-center py-8 glass-panel rounded-2xl">
+                        <p class="text-zinc-500 text-xs">No hay escaneos guardados en el historial.</p>
+                    </div>`;
                 return;
             }
 
-            container.innerHTML = history.map(item => `
-                <div onclick='selectBeer(${JSON.stringify(item).replace(/'/g, "&apos;")})' class="p-3 bg-zinc-900/90 border border-zinc-800/80 rounded-2xl flex justify-between items-center hover:bg-zinc-800 cursor-pointer transition">
-                    <div>
-                        <p class="text-xs font-bold text-zinc-200">${item.name}</p>
-                        <p class="text-[10px] text-zinc-500">${item.brand} • ${item.timestamp}</p>
+            container.innerHTML = history.map((item) => `
+                <div onclick='selectBeer(${JSON.stringify(item).replace(/'/g, "&apos;")})' class="glass-panel p-3.5 rounded-2xl flex justify-between items-center hover:bg-zinc-800/50 cursor-pointer transition">
+                    <div class="space-y-0.5">
+                        <p class="font-bold text-xs text-zinc-100">${item.name}</p>
+                        <p class="text-[10px] text-zinc-400">${item.brand} • <span class="text-zinc-500">${item.timestamp || ''}</span></p>
                     </div>
-                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-lg ${item.status === 'cumple' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30'}">
-                        ${item.purity}
+                    <span class="text-xs font-bold px-2 py-1 rounded-lg ${item.status === 'cumple' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'}">
+                        ${item.status === 'cumple' ? 'Pura' : 'Adjuntos'}
                     </span>
                 </div>
             `).join('');
         }
 
         function clearHistory() {
-            if (confirm("¿Deseas borrar todo tu historial de escaneos?")) {
+            if (confirm("¿Borrar todo el historial de escaneos local?")) {
                 localStorage.removeItem('pacoli_scan_history');
                 renderHistory();
                 updateHistoryBadge();
@@ -653,153 +622,53 @@
 
         function exportHistoryCSV() {
             const history = getHistory();
-            if (history.length === 0) return alert("No hay datos para exportar.");
+            if (!history.length) return alert("El historial está vacío.");
 
-            let csv = "Nombre,Marca,Estado,Puntuación,Fecha\n";
-            history.forEach(row => {
-                csv += `"${row.name}","${row.brand}","${row.status}","${row.score}","${row.timestamp}"\n`;
+            let csvContent = "data:text/csv;charset=utf-8,Nombre,Marca,Estado,Puntuacion,Fecha\n";
+            history.forEach(h => {
+                csvContent += `"${h.name}","${h.brand}","${h.purity}","${h.score}","${h.timestamp || ''}"\n`;
             });
 
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `PacoliScanner_Historial_${new Date().toISOString().slice(0,10)}.csv`;
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `pacoliscanner_historial_${Date.now()}.csv`);
+            document.body.appendChild(link);
             link.click();
+            document.body.removeChild(link);
         }
 
         // -------------------------------------------------------------
-        // 7. ESTADÍSTICAS Y MÉTRICAS
+        // 7. ESTADÍSTICAS Y MÉTRICAS DE COMPOSICIÓN
         // -------------------------------------------------------------
         function renderStats() {
             const history = getHistory();
             const total = history.length;
-            const pureCount = history.filter(i => i.status === 'cumple').length;
-            const impureCount = total - pureCount;
-            const ratio = total > 0 ? Math.round((pureCount / total) * 100) : 0;
 
             document.getElementById("statTotal").innerText = total;
-            document.getElementById("statPureRatio").innerText = `${ratio}%`;
 
-            document.getElementById("labelPureCount").innerText = `Puras: ${pureCount}`;
-            document.getElementById("labelImpureCount").innerText = `Con Adjuntos: ${impureCount}`;
-
-            document.getElementById("barPure").style.width = `${total > 0 ? (pureCount / total) * 100 : 50}%`;
-            document.getElementById("barImpure").style.width = `${total > 0 ? (impureCount / total) * 100 : 50}%`;
-        }
-
-        // -------------------------------------------------------------
-        // 8. ESCÁNER DE CÁMARA (HTML5-QRCode & Flash Control)
-        // -------------------------------------------------------------
-        let html5QrCode = null;
-        let isTorchOn = false;
-
-        async function openScanner() {
-            playSound('scan');
-            document.getElementById("scannerModal").classList.remove("hidden");
-
-            if (!html5QrCode) {
-                html5QrCode = new Html5Qrcode("reader");
-            }
-
-            try {
-                const devices = await Html5Qrcode.getCameras();
-                const cameraSelect = document.getElementById("cameraSelect");
-
-                if (devices && devices.length) {
-                    cameraSelect.innerHTML = devices.map(cam => `<option value="${cam.id}">${cam.label || 'Cámara ' + cam.id}</option>`).join('');
-                    const backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('trasera')) || devices[0];
-                    cameraSelect.value = backCam.id;
-                    startCamera(backCam.id);
-                } else {
-                    alert("No se hallaron cámaras disponibles.");
-                }
-            } catch (err) {
-                alert("Permiso de cámara denegado.");
-            }
-        }
-
-        function startCamera(cameraId) {
-            html5QrCode.start(
-                cameraId,
-                { fps: 12, qrbox: { width: 260, height: 160 } },
-                (decodedText) => {
-                    playSound('scan');
-                    closeScanner();
-                    processBarcode(decodedText);
-                },
-                () => {}
-            ).catch(err => console.error(err));
-        }
-
-        function switchCamera(camId) {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop().then(() => startCamera(camId));
-            }
-        }
-
-        function toggleTorch() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                isTorchOn = !isTorchOn;
-                html5QrCode.applyVideoConstraints({ advanced: [{ torch: isTorchOn }] })
-                    .catch(() => alert("El flash de esta cámara no es soportado."));
-            }
-        }
-
-        function closeScanner() {
-            if (html5QrCode && html5QrCode.isScanning) {
-                html5QrCode.stop().then(() => {
-                    document.getElementById("scannerModal").classList.add("hidden");
-                }).catch(() => document.getElementById("scannerModal").classList.add("hidden"));
-            } else {
-                document.getElementById("scannerModal").classList.add("hidden");
-            }
-        }
-
-        // -------------------------------------------------------------
-        // 9. PROCESAMIENTO EAN Y FALLBACK OPEN FOOD FACTS
-        // -------------------------------------------------------------
-        async function processBarcode(barcode) {
-            const allBeers = getAllBeers();
-
-            if (allBeers[barcode]) {
-                selectBeer(allBeers[barcode]);
+            if (total === 0) {
+                document.getElementById("statPureRatio").innerText = "0%";
+                document.getElementById("barPure").style.width = "50%";
+                document.getElementById("barImpure").style.width = "50%";
+                document.getElementById("labelPureCount").innerText = "Puras: 0";
+                document.getElementById("labelImpureCount").innerText = "Con Adjuntos: 0";
                 return;
             }
 
-            // Fallback API Global
-            try {
-                const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
-                const data = await res.json();
+            const pureCount = history.filter(h => h.status === 'cumple').length;
+            const impureCount = total - pureCount;
+            const pureRatio = Math.round((pureCount / total) * 100);
 
-                if (data.status === 1 && data.product) {
-                    const prod = data.product;
-                    const ingText = prod.ingredients_text || prod.ingredients_text_es || "Ingredientes sin especificar en base de datos global";
-
-                    const lower = ingText.toLowerCase();
-                    const isImpure = lower.includes("maíz") || lower.includes("arroz") || lower.includes("azúcar") || lower.includes("corn") || lower.includes("rice");
-
-                    const offBeer = {
-                        name: prod.product_name || `EAN: ${barcode}`,
-                        brand: prod.brands || "Marca General",
-                        purity: !isImpure ? "100% Pura (Open Food Facts)" : "No Cumple (Adjuntos detectados)",
-                        status: !isImpure ? "cumple" : "nocumple",
-                        ingredients: ingText.split(',').map(s => s.trim()),
-                        details: !isImpure ? "No se identificaron maíces ni azúcares industriales." : "Se han registrado azúcares o cereales de relleno.",
-                        score: !isImpure ? "8.0/10" : "5.0/10",
-                        color: !isImpure ? "from-emerald-950 via-zinc-900 to-zinc-950" : "from-rose-950 via-zinc-900 to-zinc-950"
-                    };
-
-                    selectBeer(offBeer);
-                } else {
-                    alert(`El código EAN ${barcode} no existe en nuestro catálogo local ni en Open Food Facts.`);
-                }
-            } catch (e) {
-                alert("Error de conexión al consultar Open Food Facts.");
-            }
+            document.getElementById("statPureRatio").innerText = `${pureRatio}%`;
+            document.getElementById("barPure").style.width = `${pureRatio}%`;
+            document.getElementById("barImpure").style.width = `${100 - pureRatio}%`;
+            document.getElementById("labelPureCount").innerText = `Puras: ${pureCount}`;
+            document.getElementById("labelImpureCount").innerText = `Con Adjuntos: ${impureCount}`;
         }
 
         // -------------------------------------------------------------
-        // 10. GESTOR DE CERVEZAS PERSONALIZADAS
+        // 8. CREACIÓN Y AÑADIDO DE CERVEZAS MANUALES
         // -------------------------------------------------------------
         function openCustomBeerModal() {
             document.getElementById("customBeerModal").classList.remove("hidden");
@@ -811,35 +680,178 @@
 
         function saveCustomBeer(e) {
             e.preventDefault();
-            const name = document.getElementById("customName").value;
-            const brand = document.getElementById("customBrand").value;
-            const ean = document.getElementById("customEAN").value || `CUSTOM_${Date.now()}`;
-            const rawIngredients = document.getElementById("customIngredients").value;
-            const ingredientsArr = rawIngredients.split(',').map(i => i.trim());
+            const name = document.getElementById("customName").value.trim();
+            const brand = document.getElementById("customBrand").value.trim();
+            const ean = document.getElementById("customEAN").value.trim();
+            const ingredientsRaw = document.getElementById("customIngredients").value.trim();
 
-            const lower = rawIngredients.toLowerCase();
-            const isImpure = lower.includes("maíz") || lower.includes("arroz") || lower.includes("azúcar") || lower.includes("maiz");
+            const ingredients = ingredientsRaw.split(',').map(s => s.trim()).filter(Boolean);
+            const lowerIngs = ingredientsRaw.toLowerCase();
+
+            const hasAdjuncts = lowerIngs.includes('maíz') || lowerIngs.includes('arroz') || lowerIngs.includes('azúcar') || lowerIngs.includes('jarabe') || lowerIngs.includes('e-');
+            const status = hasAdjuncts ? 'nocumple' : 'cumple';
+            const purity = hasAdjuncts ? 'No Cumple (Contiene Adjuntos/Aditivos)' : '100% Pura';
+            const score = hasAdjuncts ? '5.0/10' : '9.0/10';
 
             const newBeer = {
                 name,
                 brand,
-                purity: !isImpure ? "100% Pura (Entrada Usuario)" : "No Cumple (Contiene adjuntos)",
-                status: !isImpure ? "cumple" : "nocumple",
-                ingredients: ingredientsArr,
-                details: "Cerveza registrada manualmente por el usuario en la base de datos local.",
-                score: !isImpure ? "8.5/10" : "5.5/10",
-                color: !isImpure ? "from-emerald-950 via-zinc-900 to-zinc-950" : "from-rose-950 via-zinc-900 to-zinc-950"
+                purity,
+                status,
+                ingredients,
+                details: hasAdjuncts 
+                    ? 'Registro manual. Contiene ingredientes o adjuntos fuera de la norma tradicional de 1516.' 
+                    : 'Registro manual. Elaborada exclusivamente con ingredientes tradicionales de pureza cervecera.',
+                score,
+                color: hasAdjuncts ? 'from-rose-950 via-zinc-900 to-zinc-950' : 'from-emerald-950 via-zinc-900 to-zinc-950'
             };
 
-            const customs = getCustomBeers();
-            customs[ean] = newBeer;
-            localStorage.setItem('pacoli_custom_beers', JSON.stringify(customs));
+            const customDb = getCustomBeers();
+            const key = ean || `CUSTOM_${Date.now()}`;
+            customDb[key] = newBeer;
+            localStorage.setItem('pacoli_custom_beers', JSON.stringify(customDb));
 
             closeCustomBeerModal();
+            e.target.reset();
             selectBeer(newBeer);
         }
 
-        // Inicializar badge al arrancar
+        // -------------------------------------------------------------
+        // 9. LECTOR DE CÓDIGO DE BARRAS POR CÁMARA (Html5Qrcode)
+        // -------------------------------------------------------------
+        let html5QrcodeScanner = null;
+        let currentCameraId = null;
+        let isTorchOn = false;
+
+        function openScanner() {
+            initAudio();
+            document.getElementById("scannerModal").classList.remove("hidden");
+
+            if (!html5QrcodeScanner) {
+                html5QrcodeScanner = new Html5Qrcode("reader");
+            }
+
+            Html5Qrcode.getCameras().then(devices => {
+                if (devices && devices.length) {
+                    const cameraSelect = document.getElementById("cameraSelect");
+                    cameraSelect.innerHTML = devices.map((d, i) => `<option value="${d.id}">${d.label || 'Cámara ' + (i + 1)}</option>`).join('');
+                    
+                    const backCam = devices.find(d => d.label.toLowerCase().includes('back') || d.label.toLowerCase().includes('trasera') || d.label.toLowerCase().includes('environment'));
+                    currentCameraId = backCam ? backCam.id : devices[0].id;
+                    cameraSelect.value = currentCameraId;
+
+                    startScanner(currentCameraId);
+                } else {
+                    alert("No se detectaron cámaras en el dispositivo.");
+                }
+            }).catch(err => {
+                console.error("Error al acceder a la cámara:", err);
+                alert("Permiso de cámara denegado o no disponible.");
+            });
+        }
+
+        function startScanner(cameraId) {
+            html5QrcodeScanner.start(
+                cameraId,
+                { fps: 10, qrbox: { width: 250, height: 150 } },
+                (decodedText) => {
+                    playSound('scan');
+                    closeScanner();
+                    processBarcode(decodedText);
+                },
+                () => {}
+            ).catch(err => console.error("Error al iniciar scanner:", err));
+        }
+
+        function switchCamera(newCameraId) {
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                html5QrcodeScanner.stop().then(() => {
+                    currentCameraId = newCameraId;
+                    startScanner(currentCameraId);
+                });
+            }
+        }
+
+        function toggleTorch() {
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                isTorchOn = !isTorchOn;
+                html5QrcodeScanner.applyVideoConstraints({
+                    advanced: [{ torch: isTorchOn }]
+                }).catch(() => alert("El dispositivo no soporta linterna/flash."));
+            }
+        }
+
+        function closeScanner() {
+            if (html5QrcodeScanner && html5QrcodeScanner.isScanning) {
+                html5QrcodeScanner.stop().then(() => {
+                    document.getElementById("scannerModal").classList.add("hidden");
+                }).catch(() => {
+                    document.getElementById("scannerModal").classList.add("hidden");
+                });
+            } else {
+                document.getElementById("scannerModal").classList.add("hidden");
+            }
+        }
+
+        // -------------------------------------------------------------
+        // 10. BÚSQUEDA AUTOMÁTICA ONLINE (Open Food Facts Fallback)
+        // -------------------------------------------------------------
+        async function processBarcode(barcode) {
+            const allBeers = getAllBeers();
+
+            if (allBeers[barcode]) {
+                selectBeer(allBeers[barcode]);
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`);
+                const data = await response.json();
+
+                if (data.status === 1 && data.product) {
+                    const product = data.product;
+                    const name = product.product_name || product.product_name_es || "Cerveza Desconocida";
+                    const brand = product.brands || "Marca Desconocida";
+                    const ingredientsText = product.ingredients_text || product.ingredients_text_es || "";
+
+                    let ingredientsList = [];
+                    if (ingredientsText) {
+                        ingredientsList = ingredientsText.split(',').map(s => s.trim());
+                    } else if (product.ingredients && product.ingredients.length) {
+                        ingredientsList = product.ingredients.map(i => i.text || i.id.replace('en:', ''));
+                    } else {
+                        ingredientsList = ["Agua", "Malta de Cebada", "Lúpulo"];
+                    }
+
+                    const lowerIngs = ingredientsText.toLowerCase();
+                    const hasAdjuncts = lowerIngs.includes('maíz') || lowerIngs.includes('corn') || lowerIngs.includes('arroz') || lowerIngs.includes('rice') || lowerIngs.includes('sugar') || lowerIngs.includes('azúcar');
+
+                    const beerData = {
+                        name: name,
+                        brand: brand,
+                        purity: hasAdjuncts ? "No Cumple (Adjuntos Detectados)" : "100% Pura",
+                        status: hasAdjuncts ? "nocumple" : "cumple",
+                        ingredients: ingredientsList,
+                        details: hasAdjuncts 
+                            ? "Consulta en línea (Open Food Facts): Se identificaron azúcares añadidos o cereales no malteados en el etiquetado."
+                            : "Consulta en línea (Open Food Facts): Composición ajustada a los parámetros tradicionales de pureza.",
+                        score: hasAdjuncts ? "5.5/10" : "8.8/10",
+                        color: hasAdjuncts ? "from-rose-950 via-zinc-900 to-zinc-950" : "from-emerald-950 via-zinc-900 to-zinc-950"
+                    };
+
+                    selectBeer(beerData);
+                } else {
+                    alert(`Código EAN ${barcode} no encontrado en línea. Puedes añadir la cerveza manualmente.`);
+                    openCustomBeerModal();
+                    document.getElementById("customEAN").value = barcode;
+                }
+            } catch (err) {
+                console.error("Error al consultar API:", err);
+                alert(`Error al consultar los datos del código ${barcode}.`);
+            }
+        }
+
+        // Inicialización de contadores de historial
         updateHistoryBadge();
     </script>
 </body>
