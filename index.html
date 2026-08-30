@@ -17,16 +17,13 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        /* Estilos base para sensación de App Nativa */
+        /* Estilos base */
         html, body {
-            height: 100%;
             width: 100%;
-            overflow: hidden;
-            position: fixed; /* Previene scroll y rebote de pantalla en iOS/Android */
+            background-color: #0f172a;
         }
         body {
             -webkit-tap-highlight-color: transparent;
-            overscroll-behavior-y: none;
             user-select: none;
             padding-top: env(safe-area-inset-top);
             padding-bottom: env(safe-area-inset-bottom);
@@ -50,43 +47,28 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* ========================================================================= */
-        /* HABILITAR SCROLL NATIVO PARA OCULTAR BARRA URL AL DESLIZAR */
-        /* ========================================================================= */
-        html, body {
-            position: static !important; /* Desbloquea la página */
-            height: auto !important; 
-            min-height: 100vh !important;
-            min-height: 100dvh !important; /* Altura dinámica (ignora barras del navegador) */
-            overflow: visible !important; /* Devuelve el scroll al navegador */
-        }
-        main {
-            overflow: visible !important;
-            flex: none !important; 
-            padding-bottom: 120px !important; /* Espacio extra para el menú inferior */
-        }
+        /* Mantener cabecera fija y menú inferior */
         header {
-            position: sticky !important; /* Mantiene la cabecera visible tipo App */
-            top: 0 !important;
-            z-index: 45 !important;
-            background: rgba(15, 23, 42, 0.85) !important;
-            backdrop-filter: blur(12px) !important;
+            position: sticky;
+            top: 0;
+            z-index: 45;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        /* ========================================================================= */
     </style>
 </head>
 <body class="app-gradient text-slate-100 min-h-screen w-full flex flex-col font-sans selection:bg-amber-500 selection:text-slate-900">
 
     <audio id="bgMusic" src="cancion.mp3" loop preload="auto"></audio>
 
-    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-white/5 px-5 pt-6 pb-4 flex items-center justify-between">
+    <header class="flex items-center justify-between px-5 pt-6 pb-4">
         <div class="flex items-center space-x-3">
-            <div class="bg-amber-500 rounded-xl p-2 shadow-lg shadow-amber-500/20">
+            <div class="p-2 shadow-lg bg-amber-500 rounded-xl shadow-amber-500/20">
                 <i data-lucide="beer" class="w-6 h-6 text-slate-900"></i>
             </div>
             <div>
-                <h1 class="font-black text-lg tracking-tight text-white flex items-center space-x-2">
+                <h1 class="flex items-center text-lg font-black tracking-tight text-white space-x-2">
                     <span>PacoliScanner</span>
                     <span class="bg-gradient-to-r from-amber-400 to-amber-600 text-slate-900 text-[10px] font-black px-1.5 py-0.5 rounded uppercase tracking-wider shadow-sm">PRO</span>
                 </h1>
@@ -98,20 +80,20 @@
         </button>
     </header>
 
-    <main class="no-scrollbar px-5 pb-32 relative min-h-[150vh]">
+    <main class="relative px-5 pb-32 no-scrollbar min-h-[150vh]">
         
-        <section id="tab-home" class="fade-in space-y-6">
+        <section id="tab-home" class="space-y-6 fade-in">
             
             <div class="relative z-20">
-                <div class="card-glass rounded-2xl p-3 flex items-center space-x-3 focus-within:border-amber-500/50 transition">
+                <div class="flex items-center p-3 transition card-glass rounded-2xl space-x-3 focus-within:border-amber-500/50">
                     <i data-lucide="search" class="w-5 h-5 text-slate-400"></i>
                     <input type="text" id="searchInput" oninput="searchBeers()" placeholder="Buscar cerveza o EAN..." 
-                           class="w-full bg-transparent border-none text-sm text-white placeholder-slate-500 focus:outline-none">
+                           class="w-full text-sm text-white bg-transparent border-none placeholder-slate-500 focus:outline-none">
                     <button onclick="clearSearch()" id="clearBtn" class="hidden p-1 text-slate-500 hover:text-slate-300">
                         <i data-lucide="x" class="w-4 h-4"></i>
                     </button>
                 </div>
-                <div id="suggestions" class="hidden absolute left-0 right-0 top-full mt-2 card-glass rounded-2xl overflow-hidden shadow-2xl border border-slate-700 max-h-64 overflow-y-auto z-30"></div>
+                <div id="suggestions" class="absolute left-0 right-0 z-30 hidden overflow-hidden overflow-y-auto border shadow-2xl top-full mt-2 card-glass rounded-2xl border-slate-700 max-h-64"></div>
             </div>
 
             <div onclick="switchTab('premium')" class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 p-4 cursor-pointer shadow-lg shadow-amber-500/20 transform hover:scale-[1.02] transition">
@@ -120,33 +102,33 @@
                 </div>
                 <div class="relative z-10">
                     <span class="bg-slate-900 text-amber-400 text-[10px] font-black px-2 py-1 rounded-full uppercase tracking-widest">Oferta Especial</span>
-                    <h3 class="font-black text-slate-900 text-lg mt-2 leading-tight">Desbloquea el análisis químico avanzado</h3>
-                    <p class="text-slate-900/80 text-xs mt-1 font-medium">Sin anuncios, escaneos ilimitados y alertas de aditivos ocultos.</p>
+                    <h3 class="mt-2 text-lg font-black leading-tight text-slate-900">Desbloquea el análisis químico avanzado</h3>
+                    <p class="mt-1 text-xs font-medium text-slate-900/80">Sin anuncios, escaneos ilimitados y alertas de aditivos ocultos.</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="filterCategory('puras')" class="card-glass p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 hover:bg-slate-800 transition">
-                    <div class="bg-emerald-500/20 p-2 rounded-full text-emerald-400">
+                <button onclick="filterCategory('puras')" class="flex flex-col items-center justify-center p-3 transition card-glass rounded-2xl space-y-2 hover:bg-slate-800">
+                    <div class="p-2 rounded-full bg-emerald-500/20 text-emerald-400">
                         <i data-lucide="shield-check" class="w-5 h-5"></i>
                     </div>
                     <span class="text-xs font-semibold text-slate-300">100% Puras</span>
                 </button>
-                <button onclick="openCustomBeerModal()" class="card-glass p-3 rounded-2xl flex flex-col items-center justify-center space-y-2 border border-dashed border-slate-600 hover:border-amber-500/50 transition">
-                    <div class="bg-slate-800 p-2 rounded-full text-slate-400">
+                <button onclick="openCustomBeerModal()" class="flex flex-col items-center justify-center p-3 transition border border-dashed card-glass rounded-2xl space-y-2 border-slate-600 hover:border-amber-500/50">
+                    <div class="p-2 rounded-full bg-slate-800 text-slate-400">
                         <i data-lucide="plus" class="w-5 h-5"></i>
                     </div>
                     <span class="text-xs font-semibold text-slate-300">Añadir Manual</span>
                 </button>
             </div>
             
-            <div class="text-center py-4 space-y-2 opacity-60">
+            <div class="py-4 text-center space-y-2 opacity-60">
                 <i data-lucide="scan-line" class="w-8 h-8 mx-auto text-slate-500"></i>
-                <p class="text-xs text-slate-400 max-w-xs mx-auto">Toca el botón central para escanear el código de barras y auditar los ingredientes.</p>
+                <p class="max-w-xs mx-auto text-xs text-slate-400">Toca el botón central para escanear el código de barras y auditar los ingredientes.</p>
             </div>
         </section>
 
-        <section id="tab-history" class="hidden fade-in space-y-4">
+        <section id="tab-history" class="hidden space-y-4 fade-in">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-bold text-white">Últimos Escaneos</h2>
                 <button onclick="clearHistory()" class="text-xs font-medium text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-lg">Vaciar</button>
@@ -155,19 +137,19 @@
                 </div>
         </section>
 
-        <section id="tab-stats" class="hidden fade-in space-y-6">
+        <section id="tab-stats" class="hidden space-y-6 fade-in">
             <h2 class="text-lg font-bold text-white">Dashboard Analítico</h2>
             
             <div class="grid grid-cols-2 gap-4">
-                <div class="card-glass p-4 rounded-2xl text-center space-y-1">
-                    <div class="w-10 h-10 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center text-amber-500 mb-2">
+                <div class="p-4 text-center card-glass rounded-2xl space-y-1">
+                    <div class="flex items-center justify-center w-10 h-10 mx-auto mb-2 rounded-full bg-amber-500/10 text-amber-500">
                         <i data-lucide="bar-chart" class="w-5 h-5"></i>
                     </div>
                     <p id="statTotal" class="text-3xl font-black text-white">0</p>
                     <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Evaluadas</p>
                 </div>
-                <div class="card-glass p-4 rounded-2xl text-center space-y-1 relative overflow-hidden">
-                    <div class="w-10 h-10 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-400 mb-2">
+                <div class="relative p-4 overflow-hidden text-center card-glass rounded-2xl space-y-1">
+                    <div class="flex items-center justify-center w-10 h-10 mx-auto mb-2 rounded-full bg-emerald-500/10 text-emerald-400">
                         <i data-lucide="percent" class="w-5 h-5"></i>
                     </div>
                     <p id="statPureRatio" class="text-3xl font-black text-white">0%</p>
@@ -175,16 +157,16 @@
                 </div>
             </div>
 
-            <div class="card-glass p-5 rounded-2xl space-y-4">
+            <div class="p-5 card-glass rounded-2xl space-y-4">
                 <h3 class="text-sm font-semibold text-slate-300">Desglose de Calidad</h3>
                 <div class="space-y-2">
                     <div class="flex justify-between text-xs font-medium">
-                        <span id="labelPureCount" class="text-emerald-400 flex items-center"><span class="w-2 h-2 rounded-full bg-emerald-400 mr-2"></span>Puras: 0</span>
-                        <span id="labelImpureCount" class="text-rose-400 flex items-center">Con Adjuntos: 0<span class="w-2 h-2 rounded-full bg-rose-400 ml-2"></span></span>
+                        <span id="labelPureCount" class="flex items-center text-emerald-400"><span class="w-2 h-2 mr-2 rounded-full bg-emerald-400"></span>Puras: 0</span>
+                        <span id="labelImpureCount" class="flex items-center text-rose-400">Con Adjuntos: 0<span class="w-2 h-2 ml-2 rounded-full bg-rose-400"></span></span>
                     </div>
-                    <div class="w-full h-4 bg-slate-800 rounded-full overflow-hidden flex shadow-inner">
-                        <div id="barPure" class="bg-emerald-500 h-full transition-all duration-700" style="width: 50%;"></div>
-                        <div id="barImpure" class="bg-rose-500 h-full transition-all duration-700" style="width: 50%;"></div>
+                    <div class="flex w-full h-4 overflow-hidden rounded-full shadow-inner bg-slate-800">
+                        <div id="barPure" class="h-full transition-all duration-700 bg-emerald-500" style="width: 50%;"></div>
+                        <div id="barImpure" class="h-full transition-all duration-700 bg-rose-500" style="width: 50%;"></div>
                     </div>
                 </div>
             </div>
@@ -195,35 +177,35 @@
             </button>
         </section>
 
-        <section id="tab-premium" class="hidden fade-in space-y-6">
-            <div class="text-center pt-4 pb-2">
+        <section id="tab-premium" class="hidden space-y-6 fade-in">
+            <div class="pt-4 pb-2 text-center">
                 <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-500/20 text-amber-400 rounded-full mb-4 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
                     <i data-lucide="crown" class="w-8 h-8"></i>
                 </div>
                 <h2 class="text-2xl font-black text-white">PacoliScanner <span class="text-amber-500">PRO+</span></h2>
-                <p class="text-sm text-slate-400 mt-2 max-w-xs mx-auto">Lleva tu auditoría cervecera al siguiente nivel. Apoya el desarrollo y desbloquea todo el potencial.</p>
+                <p class="max-w-xs mx-auto mt-2 text-sm text-slate-400">Lleva tu auditoría cervecera al siguiente nivel. Apoya el desarrollo y desbloquea todo el potencial.</p>
             </div>
 
             <div class="space-y-3">
-                <div class="card-glass p-4 rounded-xl flex items-center space-x-4 border border-amber-500/20">
-                    <i data-lucide="check-circle" class="w-5 h-5 text-amber-500 shrink-0"></i>
+                <div class="flex items-center p-4 border card-glass rounded-xl space-x-4 border-amber-500/20">
+                    <i data-lucide="check-circle" class="w-5 h-5 shrink-0 text-amber-500"></i>
                     <p class="text-sm text-slate-200">Base de datos offline ampliada (+10,000 referencias).</p>
                 </div>
-                <div class="card-glass p-4 rounded-xl flex items-center space-x-4 border border-amber-500/20">
-                    <i data-lucide="check-circle" class="w-5 h-5 text-amber-500 shrink-0"></i>
+                <div class="flex items-center p-4 border card-glass rounded-xl space-x-4 border-amber-500/20">
+                    <i data-lucide="check-circle" class="w-5 h-5 shrink-0 text-amber-500"></i>
                     <p class="text-sm text-slate-200">Detector avanzado de conservantes (E-XXX) y jarabes ocultos.</p>
                 </div>
-                <div class="card-glass p-4 rounded-xl flex items-center space-x-4 border border-amber-500/20">
-                    <i data-lucide="check-circle" class="w-5 h-5 text-amber-500 shrink-0"></i>
+                <div class="flex items-center p-4 border card-glass rounded-xl space-x-4 border-amber-500/20">
+                    <i data-lucide="check-circle" class="w-5 h-5 shrink-0 text-amber-500"></i>
                     <p class="text-sm text-slate-200">Experiencia 100% libre de anuncios.</p>
                 </div>
             </div>
 
-            <div class="space-y-4 pt-4">
+            <div class="pt-4 space-y-4">
                 <button class="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 text-base font-black rounded-xl shadow-lg shadow-amber-500/25 transition transform active:scale-95">
                     Suscribirse por 2.99€ / mes
                 </button>
-                <button class="w-full py-4 bg-slate-800 text-slate-300 hover:bg-slate-700 text-sm font-bold rounded-xl transition">
+                <button class="w-full py-4 text-sm font-bold transition bg-slate-800 text-slate-300 hover:bg-slate-700 rounded-xl">
                     Pago único de por vida - 24.99€
                 </button>
             </div>
@@ -233,15 +215,15 @@
 
     </main>
 
-    <nav class="fixed bottom-0 w-full bg-slate-900/95 backdrop-blur-md border-t border-slate-800 z-40 pb-safe">
-        <div class="flex justify-around items-center px-2 py-2 relative">
+    <nav class="fixed bottom-0 z-40 w-full border-t bg-slate-900/95 backdrop-blur-md border-slate-800 pb-safe">
+        <div class="relative flex items-center justify-around px-2 py-2">
             
-            <button onclick="switchTab('home')" id="nav-home" class="nav-btn flex flex-col items-center p-2 text-amber-500 w-16">
+            <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center w-16 p-2 nav-btn text-amber-500">
                 <i data-lucide="home" class="w-6 h-6 mb-1"></i>
                 <span class="text-[10px] font-semibold">Inicio</span>
             </button>
             
-            <button onclick="switchTab('history')" id="nav-history" class="nav-btn flex flex-col items-center p-2 text-slate-500 hover:text-slate-300 transition w-16 relative">
+            <button onclick="switchTab('history')" id="nav-history" class="relative flex flex-col items-center w-16 p-2 transition nav-btn text-slate-500 hover:text-slate-300">
                 <i data-lucide="clock" class="w-6 h-6 mb-1"></i>
                 <span class="text-[10px] font-semibold">Historial</span>
                 <span id="historyBadge" class="hidden absolute top-1 right-2 bg-rose-500 text-white text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center">0</span>
@@ -249,12 +231,12 @@
 
             <div class="w-16"></div>
 
-            <button onclick="switchTab('stats')" id="nav-stats" class="nav-btn flex flex-col items-center p-2 text-slate-500 hover:text-slate-300 transition w-16">
+            <button onclick="switchTab('stats')" id="nav-stats" class="flex flex-col items-center w-16 p-2 transition nav-btn text-slate-500 hover:text-slate-300">
                 <i data-lucide="pie-chart" class="w-6 h-6 mb-1"></i>
                 <span class="text-[10px] font-semibold">Datos</span>
             </button>
             
-            <button onclick="switchTab('premium')" id="nav-premium" class="nav-btn flex flex-col items-center p-2 text-slate-500 hover:text-amber-400 transition w-16">
+            <button onclick="switchTab('premium')" id="nav-premium" class="flex flex-col items-center w-16 p-2 transition nav-btn text-slate-500 hover:text-amber-400">
                 <i data-lucide="star" class="w-6 h-6 mb-1"></i>
                 <span class="text-[10px] font-semibold">PRO</span>
             </button>
@@ -265,8 +247,8 @@
         </div>
     </nav>
 
-    <div id="resultModal" class="hidden fixed inset-0 z-50 flex flex-col justify-end">
-        <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onclick="closeResultModal()"></div>
+    <div id="resultModal" class="fixed inset-0 z-50 flex flex-col justify-end hidden">
+        <div class="absolute inset-0 backdrop-blur-sm bg-slate-950/80" onclick="closeResultModal()"></div>
         <div class="relative bg-slate-900 rounded-t-3xl border-t border-slate-700 p-6 slide-up w-full max-h-[85vh] overflow-y-auto">
             <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto mb-6"></div>
             
@@ -279,42 +261,42 @@
         </div>
     </div>
 
-    <div id="scannerModal" class="hidden fixed inset-0 bg-slate-950 z-50 flex flex-col slide-up">
-        <div class="px-5 py-4 flex justify-between items-center bg-slate-900 border-b border-slate-800">
-            <h3 class="font-bold text-white flex items-center space-x-2">
+    <div id="scannerModal" class="fixed inset-0 z-50 flex flex-col hidden bg-slate-950 slide-up">
+        <div class="flex items-center justify-between px-5 py-4 border-b bg-slate-900 border-slate-800">
+            <h3 class="flex items-center font-bold text-white space-x-2">
                 <i data-lucide="focus" class="w-5 h-5 text-amber-500"></i>
                 <span>Escáner de Barras</span>
             </h3>
-            <button onclick="closeScanner()" class="p-2 text-slate-400 hover:text-white bg-slate-800 rounded-full">
+            <button onclick="closeScanner()" class="p-2 rounded-full text-slate-400 hover:text-white bg-slate-800">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
         </div>
 
-        <div class="flex-1 relative flex flex-col justify-center items-center bg-black">
+        <div class="relative flex flex-col items-center justify-center flex-1 bg-black">
             <div id="reader" class="w-full max-w-md"></div>
             
             <div class="absolute inset-0 pointer-events-none border-[40px] border-black/50">
-                <div class="w-full h-full border-2 border-amber-500/50 rounded-lg relative">
+                <div class="relative w-full h-full border-2 rounded-lg border-amber-500/50">
                     <div class="absolute top-1/2 left-0 w-full h-0.5 bg-amber-500/80 shadow-[0_0_10px_rgba(245,158,11,1)]"></div>
                 </div>
             </div>
         </div>
 
-        <div class="bg-slate-900 p-5 pb-8 flex justify-center space-x-4 border-t border-slate-800">
-            <select id="cameraSelect" onchange="switchCamera(this.value)" class="bg-slate-800 text-white text-sm rounded-xl px-4 py-3 border border-slate-700 focus:outline-none flex-1"></select>
-            <button onclick="toggleTorch()" class="p-3 bg-slate-800 text-amber-400 rounded-xl border border-slate-700">
+        <div class="flex justify-center p-5 pb-8 border-t bg-slate-900 space-x-4 border-slate-800">
+            <select id="cameraSelect" onchange="switchCamera(this.value)" class="flex-1 px-4 py-3 text-sm text-white border focus:outline-none bg-slate-800 rounded-xl border-slate-700"></select>
+            <button onclick="toggleTorch()" class="p-3 border bg-slate-800 text-amber-400 rounded-xl border-slate-700">
                 <i data-lucide="zap" class="w-6 h-6"></i>
             </button>
         </div>
     </div>
 
-    <div id="customBeerModal" class="hidden fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-50 flex items-center justify-center p-5 fade-in">
-        <div class="card-glass w-full max-w-md p-6 rounded-3xl border border-slate-700 shadow-2xl relative">
+    <div id="customBeerModal" class="fixed inset-0 z-50 flex items-center justify-center hidden p-5 backdrop-blur-sm bg-slate-950/90 fade-in">
+        <div class="relative w-full max-w-md p-6 border shadow-2xl card-glass rounded-3xl border-slate-700">
             <button onclick="closeCustomBeerModal()" class="absolute top-4 right-4 text-slate-500 hover:text-white">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
             
-            <h3 class="font-bold text-lg text-white mb-5 flex items-center space-x-2">
+            <h3 class="flex items-center mb-5 text-lg font-bold text-white space-x-2">
                 <i data-lucide="database" class="w-5 h-5 text-amber-500"></i>
                 <span>Ingreso Manual</span>
             </h3>
@@ -334,7 +316,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-400 mb-1.5 uppercase">Ingredientes (Separar por comas)</label>
-                    <textarea id="customIngredients" required placeholder="Agua, Malta de Cebada, Maíz, Lúpulo..." class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-3 text-white text-sm focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition h-24 resize-none"></textarea>
+                    <textarea id="customIngredients" required placeholder="Agua, Malta de Cebada, Maíz, Lúpulo..." class="w-full h-24 p-3 text-sm text-white transition border resize-none bg-slate-900/50 border-slate-700 rounded-xl focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"></textarea>
                 </div>
                 <button type="submit" class="w-full py-3.5 bg-amber-500 text-slate-900 font-bold text-base rounded-xl hover:bg-amber-400 transition shadow-lg shadow-amber-500/20">
                     Registrar y Analizar
